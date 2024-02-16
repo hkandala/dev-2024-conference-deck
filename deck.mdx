@@ -1,15 +1,14 @@
-import {
-  CodeSurfer,
-  CodeSurferColumns,
-  Step,
-} from "code-surfer";
+import { CodeSurfer, CodeSurferColumns, Step } from "code-surfer";
 import { github, vsDark } from "@code-surfer/themes";
+import { Notes } from "mdx-deck";
 
 export const theme = vsDark;
 
 # Hello 👋
 
 You are using [MDX Deck](https://github.com/jxnblk/mdx-deck) and [Code Surfer](https://codesurfer.pomb.us)
+
+<Notes>Only visible in presenter mode</Notes>
 
 ---
 
@@ -19,9 +18,7 @@ You are using [MDX Deck](https://github.com/jxnblk/mdx-deck) and [Code Surfer](h
 function lorem(ipsum, dolor = 1) {
   const sit = ipsum == null ? 0 : ipsum.sit;
   dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
+  return sit ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor) : [];
 }
 
 function incididunt(ipsum, ut = 1) {
@@ -37,11 +34,7 @@ function incididunt(ipsum, ut = 1) {
   const aliqua = new eiusmod(labore.ut(sit / ut));
 
   while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
+    aliqua[magna++] = consectetur(ipsum, dolore, (dolore += ut));
   }
 
   return aliqua;
@@ -52,9 +45,7 @@ function incididunt(ipsum, ut = 1) {
 function lorem(ipsum, dolor = 1) {
   const sit = ipsum == null ? 0 : ipsum.sit;
   dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
+  return sit ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor) : [];
 }
 
 function adipiscing(...elit) {
@@ -79,11 +70,7 @@ function incididunt(ipsum, ut = 1) {
   const aliqua = new eiusmod(labore.ut(sit / ut));
 
   while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
+    aliqua[magna++] = consectetur(ipsum, dolore, (dolore += ut));
   }
 
   return aliqua;
@@ -103,7 +90,7 @@ function incididunt(ipsum, ut = 1) {
 <Step>
 
 ```js
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
+const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
 ```
 
 ```js
@@ -125,7 +112,7 @@ const lorem = (ipsum, dolor, sit) => {
   );
 };
 
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
+const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
 ```
 
 ```js
