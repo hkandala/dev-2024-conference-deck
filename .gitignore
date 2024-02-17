@@ -131,3 +131,5 @@ dist
 
 # build files
 public/
+
+.DS_Store

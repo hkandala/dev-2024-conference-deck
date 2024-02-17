@@ -1,18 +1,124 @@
 import { CodeSurfer, CodeSurferColumns, Step } from "code-surfer";
 import { github, vsDark } from "@code-surfer/themes";
+
 import { Notes } from "mdx-deck";
 
-export const theme = vsDark;
+import "./styles.css";
 
-# Hello 👋
+import diagram from "./images/diagram.png";
 
-You are using [MDX Deck](https://github.com/jxnblk/mdx-deck) and [Code Surfer](https://codesurfer.pomb.us)
+export const theme = {
+  googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
+  fonts: {
+    body: '"IBM Plex Mono", monospace',
+    monospace: '"IBM Plex Mono", monospace',
+  },
+  colors: {
+    text: "#f0eeed",
+    background: "#161a1e",
+  },
+  styles: {
+    root: {
+      textAlign: "left",
+    },
+    Slide: {
+      display: "block",
+    },
+    h1: {
+      paddingBottom: "0.5em",
+      borderBottom: "10px solid",
+    },
+    h2: {
+      paddingBottom: "0.4em",
+      borderBottom: "5px solid",
+    },
+    h3: {
+      paddingBottom: "0.3em",
+      borderBottom: "5px solid",
+    },
+    p: {
+      fontSize: "0.75em",
+    },
+    li: {
+      fontSize: "0.75em",
+    },
+  },
+};
 
-<Notes>Only visible in presenter mode</Notes>
+<div className="title-slide">
+
+# Concurrency Models Demystified
+
+Harish Kandala
+
+</div>
 
 ---
 
-<CodeSurfer>
+<div className="content-slide">
+
+## About Me
+
+Harish Kandala
+
+</div>
+
+---
+
+<div className="quote-slide">
+
+> "Quote about concurrency"
+
+</div>
+
+---
+
+<div className="content-slide">
+
+## What is Concurrency?
+
+Concurrency is the ability of different parts or units of a program, algorithm, or problem to be executed out-of-order or in partial order, without affecting the final outcome.
+
+<Notes>
+  <div className="notes">
+    Concurrency is not parallelism Concurrency is about dealing with lots of
+    things at once Parallelism is about doing lots of things at once
+  </div>
+</Notes>
+
+</div>
+
+---
+
+<div className="content-slide">
+
+## Concurrency vs Parallelism
+
+- Concurrency is about dealing with lots of things at once.
+- Parallelism is about doing lots of things at once.
+
+</div>
+
+---
+
+<div className="content-slide">
+
+## Shared Mutable State
+
+- Shared mutable state is the root of all evil in concurrent programming.
+- It is the cause of most concurrency bugs and performance issues.
+
+</div>
+
+---
+
+<div className="image-slide">
+  <Image className="image" src={diagram}></Image>
+</div>
+
+---
+
+<CodeSurfer theme={vsDark}>
 
 ```js title="This is a title" subtitle="and this a subtitle"
 function lorem(ipsum, dolor = 1) {
@@ -135,5 +241,8 @@ const sed = (eiusmod, tempor, incididunt) => {
 
 ---
 
-docs:  
-[codesurfer.pomb.us](https://codesurfer.pomb.us)
+<div className="content-slide">
+
+## References
+
+</div>
