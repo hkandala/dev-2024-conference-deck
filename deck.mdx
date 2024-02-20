@@ -1,5 +1,6 @@
 import { CodeSurfer, CodeSurferColumns, Step } from "code-surfer";
 import { github, vsDark } from "@code-surfer/themes";
+import "prismjs/components/prism-java";
 
 import { Notes } from "mdx-deck";
 
@@ -120,70 +121,239 @@ Concurrency is the ability of different parts or units of a program, algorithm, 
 
 <CodeSurfer theme={vsDark}>
 
-```js title="This is a title" subtitle="and this a subtitle"
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor) : [];
-}
+```java
+public class Account {
+  private int id;
+  private int balance;
 
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
-
-  if (!sit || ut < 1) {
-    return [];
+  public Account(int id, int balance) {
+    this.id = id;
+    this.balance = balance;
   }
 
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
-
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(ipsum, dolore, (dolore += ut));
+  public void deposit(int amount) {
+    balance += amount;
   }
 
-  return aliqua;
-}
-```
-
-```js
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor) : [];
-}
-
-function adipiscing(...elit) {
-  if (!elit.sit) {
-    return [];
+  public void withdraw(int amount) {
+    if (balance >= amount) {
+      balance -= amount;
+    }
   }
 
-  const sed = elit[0];
-  return eiusmod.tempor(sed) ? sed : [sed];
-}
-
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
-
-  if (!sit || ut < 1) {
-    return [];
+  public int getAccountID() {
+    return id;
   }
 
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
-
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(ipsum, dolore, (dolore += ut));
+  public int getBalance() {
+    return balance;
   }
-
-  return aliqua;
 }
 ```
 
-```diff 1[10:14],2[15:19],3[22:27],10:12
+```diff 10:12
+
+```
+
+```diff 14:18
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class Main {
+  public static void main(String[] args) throws InterruptedException {
+    final Account[] accounts = new Account[5];
+    for (int i = 0; i < accounts.length; i++) {
+      accounts[i] = new Account(i, 100);
+    }
+
+    ExecutorService executor = Executors.newFixedThreadPool(20);
+    for (int i = 0; i < 1000; i++) {
+      final int idx = (int) (Math.random() * 5);
+      final int amount = (int) (Math.random() * 91) + 10;
+      if (Math.random() > 0.5) {
+        executor.execute(() -> {
+          accounts[idx].deposit(amount);
+        });
+      } else {
+        executor.execute(() -> {
+          accounts[idx].withdraw(amount);
+        });
+      }
+    }
+
+    shutdownAndAwaitTermination(executor);
+
+    System.out.println("\nFinal balances:");
+    for (int i = 0; i < accounts.length; i++) {
+      System.out.println("Account " + i + ": " + accounts[i].getBalance());
+    }
+  }
+}
+```
+
+```diff 3:6
+
+```
+
+```diff 8:21
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class Account {
+  private int id;
+  private int balance;
+
+  public Account(int id, int balance) {
+    this.id = id;
+    this.balance = balance;
+  }
+
+  public void deposit(int amount) {
+    balance += amount;
+  }
+
+  public void withdraw(int amount) {
+    if (balance >= amount) {
+      balance -= amount;
+    }
+  }
+
+  public int getAccountID() {
+    return id;
+  }
+
+  public int getBalance() {
+    return balance;
+  }
+}
+```
+
+```java
+public class Account {
+  private int id;
+  private int balance;
+
+  private final Lock lock = new ReentrantLock();
+
+  public Account(int id, int balance) {
+    this.id = id;
+    this.balance = balance;
+  }
+
+  public void deposit(int amount) {
+    balance += amount;
+  }
+
+  public void withdraw(int amount) {
+    if (balance >= amount) {
+      balance -= amount;
+    }
+  }
+
+  public int getAccountID() {
+    return id;
+  }
+
+  public int getBalance() {
+    return balance;
+  }
+}
+```
+
+```java 12:19
+public class Account {
+  private int id;
+  private int balance;
+
+  private final Lock lock = new ReentrantLock();
+
+  public Account(int id, int balance) {
+    this.id = id;
+    this.balance = balance;
+  }
+
+  public void deposit(int amount) {
+    lock.lock();
+    try {
+      balance += amount;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  public void withdraw(int amount) {
+    if (balance >= amount) {
+      balance -= amount;
+    }
+  }
+
+  public int getAccountID() {
+    return id;
+  }
+
+  public int getBalance() {
+    return balance;
+  }
+}
+```
+
+```java 21:30
+public class Account {
+  private int id;
+  private int balance;
+
+  private final Lock lock = new ReentrantLock();
+
+  public Account(int id, int balance) {
+    this.id = id;
+    this.balance = balance;
+  }
+
+  public void deposit(int amount) {
+    lock.lock();
+    try {
+      balance += amount;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  public void withdraw(int amount) {
+    lock.lock();
+    try {
+      if (balance >= amount) {
+        balance -= amount;
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  public int getAccountID() {
+    return id;
+  }
+
+  public int getBalance() {
+    return balance;
+  }
+}
+```
+
+```diff
 
 ```
 
