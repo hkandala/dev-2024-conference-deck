@@ -6,7 +6,6 @@ import "prismjs/components/prism-java";
 
 import "./styles.css";
 
-import diagram from "./assets/diagram.png";
 import tweet from "./assets/tweet.png";
 import comparisonVid from "./assets/comparison.mp4";
 import comparisonImg from "./assets/comparison.png";
@@ -83,7 +82,7 @@ TODO
 
 <div className="content-slide">
 
-### Why Concurrency
+### Why Concurrency?
 
 - The clock speed, the metronome of processors, steadily increased until peaking at 3.7 GHz in 2004. Since then, it has dropped back to around 3 GHz.
 - The number of transistors on a chip has continued to double every two years, but the power consumption has also doubled.
@@ -91,6 +90,12 @@ TODO
 
 <br />
 
+</div>
+
+---
+
+<div className="image-slide" style={{ backgroundColor: "white" }}>
+  <Image className="image" src={graph}></Image>
 </div>
 
 ---
@@ -103,12 +108,6 @@ TODO
 <div className="reference">- Herb Sutter</div>
 
 </div>
-</div>
-
----
-
-<div className="image-slide" style={{ backgroundColor: "white" }}>
-  <Image className="image" src={graph}></Image>
 </div>
 
 ---
@@ -133,10 +132,10 @@ TODO
 
 ### Concurrency vs Parallelism
 
-As Rob Pike puts it:
+As Rob Pike puts it, concurrency is about dealing with lots of things at once while parallelism is about doing lots of things at once.
 
-- Concurrency is about dealing with lots of things at once.
-- Parallelism is about doing lots of things at once.
+- Concurrency: It's a way to structure a program to handle multiple tasks that could be independent or interdependent.
+- Parallelism: It involves performing multiple operations simultaneously, typically using multiple processors or cores.
 
 </div>
 
@@ -166,6 +165,11 @@ As Rob Pike puts it:
 - A concurrency model is a way of structuring the code to make it easier to write and reason about concurrent programs.
 - It is a way of thinking about concurrency.
 - Concurrency models should be easy to use, understand, and reason about.
+- They are broadly classified into three categories:
+
+  - shared state
+  - message passing
+  - asynchronous programming.
 
 </div>
 
@@ -175,15 +179,14 @@ As Rob Pike puts it:
 
 ### Shared Mutable State
 
-- Shared mutable state is the root of all evil in concurrent programming.
-- It is the cause of most concurrency bugs and performance issues.
+Shared mutable state works as follows:
 
-</div>
+- If two or more parties can change the same data (variables, objects, etc.).
+- And if their lifetimes overlap.
+- Then there is a risk of one party's modifications preventing other parties from working correctly.
 
----
+Shared mutable state is the root of all evil in concurrent programming. It is the cause of most concurrency bugs and performance issues.
 
-<div className="image-slide">
-  <Image className="image" src={diagram}></Image>
 </div>
 
 ---
