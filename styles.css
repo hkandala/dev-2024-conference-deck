@@ -1,3 +1,7 @@
+li {
+  margin-bottom: 1em;
+}
+
 .title-slide {
   padding: 4em;
 }
@@ -16,6 +20,12 @@
 
 .quote-slide blockquote {
   text-align: center;
+  margin: 0;
+}
+
+.quote-slide .reference {
+  text-align: right;
+  font-size: 0.25em;
 }
 
 .image-slide {
@@ -26,6 +36,14 @@
 
 .image {
   background-size: contain !important;
+}
+
+.center-slide {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .notes {

@@ -1,12 +1,17 @@
 import { CodeSurfer, CodeSurferColumns, Step } from "code-surfer";
 import { github, vsDark } from "@code-surfer/themes";
-import "prismjs/components/prism-java";
-
 import { Notes } from "mdx-deck";
+
+import "prismjs/components/prism-java";
 
 import "./styles.css";
 
-import diagram from "./images/diagram.png";
+import diagram from "./assets/diagram.png";
+import tweet from "./assets/tweet.png";
+import comparisonVid from "./assets/comparison.mp4";
+import comparisonImg from "./assets/comparison.png";
+import channels from "./assets/channels.mp4";
+import graph from "./assets/graph.png";
 
 export const theme = {
   googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
@@ -23,7 +28,7 @@ export const theme = {
       textAlign: "left",
     },
     Slide: {
-      display: "block",
+      display: "block"
     },
     h1: {
       paddingBottom: "0.5em",
@@ -58,33 +63,66 @@ Harish Kandala
 
 <div className="content-slide">
 
-## About Me
+### About Me
 
 Harish Kandala
+
+Enterprise Engineer @ Meta
+
+TODO
 
 </div>
 
 ---
 
-<div className="quote-slide">
-
-> "Quote about concurrency"
-
+<div className="image-slide">
+  <Image className="image" src={tweet}></Image>
 </div>
 
 ---
 
 <div className="content-slide">
 
-## What is Concurrency?
+### Why Concurrency
 
-Concurrency is the ability of different parts or units of a program, algorithm, or problem to be executed out-of-order or in partial order, without affecting the final outcome.
+- The clock speed, the metronome of processors, steadily increased until peaking at 3.7 GHz in 2004. Since then, it has dropped back to around 3 GHz.
+- The number of transistors on a chip has continued to double every two years, but the power consumption has also doubled.
+- The primary goal of using conccurent programming is to make the most of the available resources.
+
+<br />
+
+</div>
+
+---
+
+<div className="quote-slide">
+<div>
+
+> "The Free Lunch Is Over"
+
+<div className="reference">- Herb Sutter</div>
+
+</div>
+</div>
+
+---
+
+<div className="image-slide" style={{ backgroundColor: "white" }}>
+  <Image className="image" src={graph}></Image>
+</div>
+
+---
+
+<div className="content-slide">
+
+### What is Concurrency?
+
+- The dictionary defines concurrency as... <br/> "simultaneous occurrence"
+- Different names like thread, task, or process refer to simultaneous occurrences, all representing a sequence of instructions running in order.
+- It involves breaking down tasks into smaller, independent units that can be executed out-of-order or in partial order, without affecting the final outcome.
 
 <Notes>
-  <div className="notes">
-    Concurrency is not parallelism Concurrency is about dealing with lots of
-    things at once Parallelism is about doing lots of things at once
-  </div>
+  <div className="notes">lorem ipsum dolor sit amet</div>
 </Notes>
 
 </div>
@@ -93,7 +131,9 @@ Concurrency is the ability of different parts or units of a program, algorithm, 
 
 <div className="content-slide">
 
-## Concurrency vs Parallelism
+### Concurrency vs Parallelism
+
+As Rob Pike puts it:
 
 - Concurrency is about dealing with lots of things at once.
 - Parallelism is about doing lots of things at once.
@@ -102,9 +142,38 @@ Concurrency is the ability of different parts or units of a program, algorithm, 
 
 ---
 
+<div className="center-slide">
+
+<video width="1600" height="900" autoPlay loop>
+  <source src={comparisonVid} type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+</div>
+
+---
+
+<div className="image-slide" style={{ backgroundColor: "white" }}>
+  <Image className="image" src={comparisonImg}></Image>
+</div>
+
+---
+
 <div className="content-slide">
 
-## Shared Mutable State
+### What is Concurrency Model?
+
+- A concurrency model is a way of structuring the code to make it easier to write and reason about concurrent programs.
+- It is a way of thinking about concurrency.
+- Concurrency models should be easy to use, understand, and reason about.
+
+</div>
+
+---
+
+<div className="content-slide">
+
+### Shared Mutable State
 
 - Shared mutable state is the root of all evil in concurrent programming.
 - It is the cause of most concurrency bugs and performance issues.
@@ -358,6 +427,17 @@ public class Account {
 ```
 
 </CodeSurfer>
+
+---
+
+<div className="center-slide">
+
+<video width="1600" height="900" autoPlay>
+  <source src={channels} type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+</div>
 
 ---
 
