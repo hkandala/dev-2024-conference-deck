@@ -1,5 +1,5 @@
-import { CodeSurfer, CodeSurferColumns, Step } from "code-surfer";
-import { github, vsDark } from "@code-surfer/themes";
+import { CodeSurfer } from "code-surfer";
+import { vsDark } from "@code-surfer/themes";
 import { Notes } from "mdx-deck";
 
 import "prismjs/components/prism-java";
@@ -235,201 +235,147 @@ public class Account {
 
 ---
 
-<CodeSurfer theme={vsDark}>
+<div className="center-slide">
 
-```java
-public class Main {
-  public static void main(String[] args) throws InterruptedException {
-    final Account[] accounts = new Account[5];
-    for (int i = 0; i < accounts.length; i++) {
-      accounts[i] = new Account(i, 100);
-    }
+<div>
 
-    ExecutorService executor = Executors.newFixedThreadPool(20);
-    for (int i = 0; i < 1000; i++) {
-      final int idx = (int) (Math.random() * 5);
-      final int amount = (int) (Math.random() * 91) + 10;
-      if (Math.random() > 0.5) {
-        executor.execute(() -> {
-          accounts[idx].deposit(amount);
-        });
-      } else {
-        executor.execute(() -> {
-          accounts[idx].withdraw(amount);
-        });
-      }
-    }
+### Locks and Synchronization
 
-    shutdownAndAwaitTermination(executor);
+(a.k.a let's find a workaround to handle shared state)
 
-    System.out.println("\nFinal balances:");
-    for (int i = 0; i < accounts.length; i++) {
-      System.out.println("Account " + i + ": " + accounts[i].getBalance());
-    }
-  }
-}
-```
+</div>
 
-```diff 3:6
-
-```
-
-```diff 8:21
-
-```
-
-</CodeSurfer>
+</div>
 
 ---
 
-<CodeSurfer theme={vsDark}>
+<div class="content-slide">
 
-```java
-public class Account {
-  private int id;
-  private int balance;
+### What and How?
 
-  public Account(int id, int balance) {
-    this.id = id;
-    this.balance = balance;
-  }
+- Locks are a way to prevent multiple threads from accessing shared state at the same time.
+- Synchronization is a way to ensure that only one thread can access shared state at a time.
+- Locks and synchronization are the most common way to handle shared state.
 
-  public void deposit(int amount) {
-    balance += amount;
-  }
+</div>
 
-  public void withdraw(int amount) {
-    if (balance >= amount) {
-      balance -= amount;
-    }
-  }
+---
 
-  public int getAccountID() {
-    return id;
-  }
+<div class="content-slide">
 
-  public int getBalance() {
-    return balance;
-  }
-}
-```
+### Word Frequency Counter
 
-```java
-public class Account {
-  private int id;
-  private int balance;
+TODO
 
-  private final Lock lock = new ReentrantLock();
+</div>
 
-  public Account(int id, int balance) {
-    this.id = id;
-    this.balance = balance;
-  }
+---
 
-  public void deposit(int amount) {
-    balance += amount;
-  }
+<div class="content-slide">
 
-  public void withdraw(int amount) {
-    if (balance >= amount) {
-      balance -= amount;
-    }
-  }
+### Pros
 
-  public int getAccountID() {
-    return id;
-  }
+- Familiarity
+- Control
+- Performance
+- Flexibility
 
-  public int getBalance() {
-    return balance;
-  }
-}
-```
+</div>
 
-```java 12:19
-public class Account {
-  private int id;
-  private int balance;
+---
 
-  private final Lock lock = new ReentrantLock();
+<div class="content-slide">
 
-  public Account(int id, int balance) {
-    this.id = id;
-    this.balance = balance;
-  }
+### Cons
 
-  public void deposit(int amount) {
-    lock.lock();
-    try {
-      balance += amount;
-    } finally {
-      lock.unlock();
-    }
-  }
+- Complexity
+- Scalability
+- Debugging Difficulty
+- Portability
 
-  public void withdraw(int amount) {
-    if (balance >= amount) {
-      balance -= amount;
-    }
-  }
+</div>
 
-  public int getAccountID() {
-    return id;
-  }
+---
 
-  public int getBalance() {
-    return balance;
-  }
-}
-```
+<div className="center-slide">
 
-```java 21:30
-public class Account {
-  private int id;
-  private int balance;
+<div>
 
-  private final Lock lock = new ReentrantLock();
+### Actor Model
 
-  public Account(int id, int balance) {
-    this.id = id;
-    this.balance = balance;
-  }
+(a.k.a what if there is no shared state at all?)
 
-  public void deposit(int amount) {
-    lock.lock();
-    try {
-      balance += amount;
-    } finally {
-      lock.unlock();
-    }
-  }
+</div>
 
-  public void withdraw(int amount) {
-    lock.lock();
-    try {
-      if (balance >= amount) {
-        balance -= amount;
-      }
-    } finally {
-      lock.unlock();
-    }
-  }
+</div>
 
-  public int getAccountID() {
-    return id;
-  }
+---
 
-  public int getBalance() {
-    return balance;
-  }
-}
-```
+<div class="content-slide">
 
-```diff
+### What and How?
 
-```
+- The actor model is a way to structure a program to handle multiple tasks that could be independent or interdependent.
+- It is based on the idea of actors, which are independent entities that communicate with each other by sending messages.
+- Actors are the fundamental unit of computation in the actor model.
+- The actor model is a message passing model.
 
-</CodeSurfer>
+</div>
+
+---
+
+<div class="content-slide">
+
+### Pros
+
+- Simplicity
+- Scalability
+- Isolation
+- Fault Tolerance
+- Asynchronous Communication
+
+</div>
+
+---
+
+<div class="content-slide">
+
+### Cons
+
+- Overhead
+- Complexity in State Management
+- Learning Curve
+- Debugging Difficulty
+- Limited Control
+
+</div>
+
+---
+
+<div className="center-slide">
+
+<div>
+
+### Communicating Sequential Processes
+
+(a.k.a yet another message passing model)
+
+</div>
+
+</div>
+
+---
+
+<div class="content-slide">
+
+### What and How?
+
+- Communicating Sequential Processes (CSP) is a way to structure a program to handle multiple tasks that could be independent or interdependent.
+- It is based on the idea of channels, which are independent entities that communicate with each other by sending messages.
+- Channels are the fundamental unit of computation in the CSP model.
+- The CSP model is a message passing model.
+
+</div>
 
 ---
 
@@ -444,58 +390,106 @@ public class Account {
 
 ---
 
-<CodeSurferColumns themes={[vsDark, github]}>
+<div class="content-slide">
 
-<Step>
+### Pros
 
-```js
-const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
-```
+- Simplicity in Concurrency
+- Deadlock Avoidance
+- Scalability
+- Composability
+- Synchronous and Asynchronous Communication
 
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
-```
+</div>
 
-</Step>
+---
 
-<Step>
+<div class="content-slide">
 
-```js
-const lorem = (ipsum, dolor, sit) => {
-  const amet = dolor - ipsum;
-  return consectetur.adipiscing(
-    {
-      elit: sed.eiusmod(sit - dolor) / amet + 2,
-    },
-    (tempor, incididunt) => ipsum + amet * incididunt
-  );
-};
+### Cons
 
-const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
-```
+- Performance Overhead
+- Complexity in Debugging
+- Learning Curve
+- Potential for Bottlenecks
+- Limited by Language Support
 
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
+</div>
 
-const sed = (eiusmod, tempor, incididunt) => {
-  const ut = tempor - eiusmod;
-  return labore.et(
-    {
-      amet: dolore.magna(incididunt - tempor) / ut + 2,
-    },
-    (aliqua, elit) => eiusmod + ut * elit
-  );
-};
-```
+---
 
-</Step>
+<div className="center-slide">
 
-</CodeSurferColumns>
+<div>
+
+### Asynchronous Programming
+
+(a.k.a what if we do everything in a single thread?)
+
+</div>
+
+</div>
+
+---
+
+<div class="content-slide">
+
+### What and How?
+
+- Asynchronous programming is a way to structure a program to handle multiple tasks that could be independent or interdependent.
+- It is based on the idea of non-blocking I/O, which allows a single thread to handle multiple tasks.
+- Asynchronous programming is a way to handle concurrency without using multiple threads.
+
+</div>
+
+---
+
+<div class="content-slide">
+
+### Pros
+
+- Non-blocking I/O
+- Simpler Asynchronous Code
+- Improved Performance
+- Concurrency Management
+- Error Handling
+
+</div>
+
+---
+
+<div class="content-slide">
+
+### Cons
+
+- Potential for Complexity
+- Learning Curve
+- Callback Hell
+- Overhead
+- Error Propagation
+
+</div>
 
 ---
 
 <div className="content-slide">
 
-## References
+### Which model to use?
+
+- There is no one-size-fits-all solution.
+- The choice of concurrency model depends on the problem at hand.
+- Shared state is the most common model, but it is also the most error-prone.
+- Message passing is a safer alternative, but it can be more complex.
+- Asynchronous programming is a good fit for I/O-bound tasks.
+
+</div>
+
+---
+
+<div className="content-slide">
+
+### References
+
+TODO
 
 </div>
