@@ -3,6 +3,7 @@ import { vsDark } from "@code-surfer/themes";
 import { Notes } from "mdx-deck";
 
 import "prismjs/components/prism-java";
+import "prismjs/components/prism-go";
 
 import "./styles.css";
 
@@ -11,6 +12,8 @@ import comparisonVid from "./assets/comparison.mp4";
 import comparisonImg from "./assets/comparison.png";
 import channels from "./assets/channels.mp4";
 import graph from "./assets/graph.png";
+import locksMeme from "./assets/locks_meme.jpg";
+import asyncMeme from "./assets/async_meme.jpg";
 
 export const theme = {
   googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
@@ -271,6 +274,431 @@ TODO
 
 ---
 
+<CodeSurfer theme={vsDark}>
+
+```java
+public class Main {
+
+  public static void main(String[] args) {
+    final HttpClient client = HttpClient.newHttpClient();
+
+    List<String> urls = getURLs();
+
+    final List<String> responses = new ArrayList<>();
+    final Map<String, Integer> wordCount = new HashMap<>();
+
+    // Fetch each URL content sequentially and store in responses list
+    urls.forEach(url -> {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        responses.add(response.body());
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    });
+
+    // Loop through each response, tokenize and populate the word count map
+    responses.forEach(response -> {
+      StringTokenizer tokenizer = new StringTokenizer(response);
+      while (tokenizer.hasMoreTokens()) {
+        String word = tokenizer.nextToken().toLowerCase();
+        wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+      }
+    });
+
+    printMostUsedWords(wordCount);
+  }
+}
+```
+
+```diff 11:23
+
+```
+
+```diff 25:32
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class Main {
+
+  private static final int NUM_PRODUCERS = 20;
+  private static final int NUM_CONSUMERS = 20;
+
+  private static final BlockingQueue<String> responseQueue = new LinkedBlockingQueue<>();
+
+  private static final Map<String, Integer> wordCount = new HashMap<>();
+
+  public static void main(String[] args) {
+    final HttpClient client = HttpClient.newHttpClient();
+
+    List<String> urls = getURLs();
+
+    ExecutorService producerService = Executors.newFixedThreadPool(NUM_PRODUCERS);
+    ExecutorService consumerService = Executors.newFixedThreadPool(NUM_CONSUMERS);
+
+    // Producer Threads
+    urls.forEach(url -> producerService.submit(() -> {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        responseQueue.put(response.body());
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    }));
+
+    // Consumer Threads
+    for (int i = 0; i < NUM_CONSUMERS; i++) {
+      consumerService.submit(() -> {
+        try {
+          while (true) {
+            String response = responseQueue.take();
+            StringTokenizer tokenizer = new StringTokenizer(response);
+            while (tokenizer.hasMoreTokens()) {
+              String word = tokenizer.nextToken().toLowerCase();
+              wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+            }
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      });
+    }
+
+    shutdownAndAwaitTermination(producerService);
+    shutdownAndAwaitTermination(consumerService);
+
+    printMostUsedWords(wordCount);
+  }
+}
+```
+
+```diff 15:16
+
+```
+
+```diff 18:30
+
+```
+
+```diff 32:48
+
+```
+
+```java
+public class Main {
+
+  private static final int NUM_PRODUCERS = 20;
+  private static final int NUM_CONSUMERS = 20;
+
+  private static final BlockingQueue<String> responseQueue = new LinkedBlockingQueue<>();
+  private static final Lock lock = new ReentrantLock();
+
+  private static final Map<String, Integer> wordCount = new HashMap<>();
+
+  public static void main(String[] args) {
+    final HttpClient client = HttpClient.newHttpClient();
+
+    List<String> urls = getURLs();
+
+    ExecutorService producerService = Executors.newFixedThreadPool(NUM_PRODUCERS);
+    ExecutorService consumerService = Executors.newFixedThreadPool(NUM_CONSUMERS);
+
+    // Producer Threads
+    urls.forEach(url -> producerService.submit(() -> {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        responseQueue.put(response.body());
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    }));
+
+    // Consumer Threads
+    for (int i = 0; i < NUM_CONSUMERS; i++) {
+      consumerService.submit(() -> {
+        try {
+          while (true) {
+            String response = responseQueue.take();
+            StringTokenizer tokenizer = new StringTokenizer(response);
+            while (tokenizer.hasMoreTokens()) {
+              String word = tokenizer.nextToken().toLowerCase();
+              wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+            }
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      });
+    }
+
+    shutdownAndAwaitTermination(producerService);
+    shutdownAndAwaitTermination(consumerService);
+
+    printMostUsedWords(wordCount);
+  }
+}
+```
+
+```java
+public class Main {
+
+  private static final int NUM_PRODUCERS = 20;
+  private static final int NUM_CONSUMERS = 20;
+
+  private static final BlockingQueue<String> responseQueue = new LinkedBlockingQueue<>();
+  private static final Lock lock = new ReentrantLock();
+
+  private static final Map<String, Integer> wordCount = new HashMap<>();
+
+  public static void main(String[] args) {
+    final HttpClient client = HttpClient.newHttpClient();
+
+    List<String> urls = getURLs();
+
+    ExecutorService producerService = Executors.newFixedThreadPool(NUM_PRODUCERS);
+    ExecutorService consumerService = Executors.newFixedThreadPool(NUM_CONSUMERS);
+
+    // Producer Threads
+    urls.forEach(url -> producerService.submit(() -> {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        responseQueue.put(response.body());
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    }));
+
+    // Consumer Threads
+    for (int i = 0; i < NUM_CONSUMERS; i++) {
+      consumerService.submit(() -> {
+        try {
+          while (true) {
+            String response = responseQueue.take();
+            StringTokenizer tokenizer = new StringTokenizer(response);
+            while (tokenizer.hasMoreTokens()) {
+              String word = tokenizer.nextToken().toLowerCase();
+              lock.lock();
+              try {
+                wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+              } finally {
+                lock.unlock();
+              }
+            }
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      });
+    }
+
+    shutdownAndAwaitTermination(producerService);
+    shutdownAndAwaitTermination(consumerService);
+
+    printMostUsedWords(wordCount);
+  }
+}
+```
+
+```java 41:43
+public class Main {
+
+  private static final int NUM_PRODUCERS = 20;
+  private static final int NUM_CONSUMERS = 20;
+
+  private static final BlockingQueue<String> responseQueue = new LinkedBlockingQueue<>();
+
+  private static final Map<String, Integer> wordCount = new HashMap<>();
+
+  public static void main(String[] args) {
+    final HttpClient client = HttpClient.newHttpClient();
+
+    List<String> urls = getURLs();
+
+    ExecutorService producerService = Executors.newFixedThreadPool(NUM_PRODUCERS);
+    ExecutorService consumerService = Executors.newFixedThreadPool(NUM_CONSUMERS);
+
+    // Producer Threads
+    urls.forEach(url -> producerService.submit(() -> {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      try {
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        responseQueue.put(response.body());
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    }));
+
+    // Consumer Threads
+    for (int i = 0; i < NUM_CONSUMERS; i++) {
+      consumerService.submit(() -> {
+        try {
+          while (true) {
+            String response = responseQueue.take();
+            StringTokenizer tokenizer = new StringTokenizer(response);
+            while (tokenizer.hasMoreTokens()) {
+              String word = tokenizer.nextToken().toLowerCase();
+              synchronized (wordCount) {
+                wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+              }
+            }
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      });
+    }
+
+    shutdownAndAwaitTermination(producerService);
+    shutdownAndAwaitTermination(consumerService);
+
+    printMostUsedWords(wordCount);
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        if (from.getBalance() < amount)
+            throw new InsufficientBalanceException(...);
+        from.debit(amount);
+        to.credit(amount);
+    }
+}
+```
+
+```java 4:9
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Unsafe check-then-act
+        if (from.getBalance() < amount)
+            throw new InsufficientBalanceException(...);
+        from.debit(amount);
+        to.credit(amount);
+    }
+}
+```
+
+```java
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:12
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:13
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // However, this can lead to deadlock
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:12
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Ensure lock ordering to avoid deadlock
+        Account first, second;
+        if (from.getAccountNumber() < to.getAccountNumber()) {
+            first = from;
+            second = to;
+        } else {
+            first = to;
+            second = from;
+        }
+
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```diff
+
+```
+
+</CodeSurfer>
+
+---
+
 <div class="content-slide">
 
 ### Pros
@@ -293,6 +721,12 @@ TODO
 - Debugging Difficulty
 - Portability
 
+</div>
+
+---
+
+<div className="image-slide">
+  <Image className="image" src={locksMeme}></Image>
 </div>
 
 ---
@@ -321,6 +755,176 @@ TODO
 - The actor model is a message passing model.
 
 </div>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class URLFetcherActor extends AbstractActor {
+  static class Fetch {
+    public final String url;
+    public final ActorRef counterRef;
+
+    public Fetch(String url, ActorRef counterRef) {
+      this.url = url;
+      this.counterRef = counterRef;
+    }
+  }
+
+  private final HttpClient client = HttpClient.newHttpClient();
+
+  @Override
+  public Receive createReceive() {
+    return receiveBuilder()
+        .match(Fetch.class, this::onFetch)
+        .build();
+  }
+
+  private void onFetch(Fetch message) {
+    try {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(message.url))
+          .GET()
+          .build();
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      message.counterRef.tell(new WordCounterActor.CountWords(response.body(), getSender()), getSelf());
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+```diff 14:19
+
+```
+
+```diff 21:32
+
+```
+
+```diff 28
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class WordCounterActor extends AbstractActor {
+  static class CountWords {
+    public final String content;
+    public final ActorRef orchestratorRef;
+
+    public CountWords(String content, ActorRef orchestratorRef) {
+      this.content = content;
+      this.orchestratorRef = orchestratorRef;
+    }
+  }
+
+  static class PrintResults {
+  }
+
+  static class ProcessComplete {
+  }
+
+  private final Map<String, Integer> wordCount = new HashMap<>();
+
+  @Override
+  public Receive createReceive() {
+    return receiveBuilder()
+        .match(CountWords.class, this::onCountWords)
+        .match(PrintResults.class, this::onPrintResults)
+        .build();
+  }
+
+  private void onCountWords(CountWords message) {
+    StringTokenizer tokenizer = new StringTokenizer(message.content);
+    while (tokenizer.hasMoreTokens()) {
+      String word = tokenizer.nextToken().toLowerCase();
+      wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+    }
+    message.orchestratorRef.tell(new ProcessComplete(), getSelf());
+  }
+}
+```
+
+```diff 20:26
+
+```
+
+```diff 28:35
+
+```
+
+```diff 34
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```java
+public class OrchestratorActor extends AbstractActor {
+  private final ActorRef wordCounterActor;
+  private final List<ActorRef> fetcherActors = new ArrayList<>();
+
+  private final int totalURLs;
+  private int completed = 0;
+
+  public OrchestratorActor() {
+    List<String> urls = getURLs();
+    totalURLs = urls.size();
+
+    wordCounterActor = getContext().actorOf(Props.create(WordCounterActor.class), "wordCounter");
+
+    urls.forEach(url -> {
+      ActorRef fetcher = getContext().actorOf(Props.create(URLFetcherActor.class));
+      fetcherActors.add(fetcher);
+      fetcher.tell(new URLFetcherActor.Fetch(url, wordCounterActor), getSelf());
+    });
+  }
+
+  @Override
+  public Receive createReceive() {
+    return receiveBuilder()
+        .match(WordCounterActor.ProcessComplete.class, this::onProcessComplete)
+        .build();
+  }
+
+  private void onProcessComplete(WordCounterActor.ProcessComplete message) {
+    completed++;
+    if (completed == totalURLs) {
+      wordCounterActor.tell(new WordCounterActor.PrintResults(), getSelf());
+    }
+  }
+}
+```
+
+```diff 2:3
+
+```
+
+```diff 8:19
+
+```
+
+```diff 21:26
+
+```
+
+```diff 28:33
+
+```
+
+</CodeSurfer>
 
 ---
 
@@ -379,6 +983,104 @@ TODO
 
 ---
 
+<CodeSurfer theme={vsDark}>
+
+```go
+func main() {
+	urls := getURLs()
+
+	responseCh := make(chan string)
+	wordCountCh := make(chan map[string]int)
+
+	var wg sync.WaitGroup
+
+	go countWords(responseCh, wordCountCh)
+
+	for _, url := range urls {
+		wg.Add(1)
+		go fetchURL(url, responseCh, &wg)
+	}
+
+	wg.Wait()
+
+	close(responseCh)
+
+	wordCount := <-wordCountCh
+
+	printMostUsedWords(wordCount)
+}
+
+func fetchURL(url string, responseCh chan<- string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Failed to fetch %s: %v\n", url, err)
+		return
+	}
+	defer resp.Body.Close()
+	scanner := bufio.NewScanner(resp.Body)
+	for scanner.Scan() {
+		responseCh <- scanner.Text()
+	}
+}
+
+func countWords(responseCh <-chan string, wordCountCh chan<- map[string]int) {
+	wordCount := make(map[string]int)
+	for text := range responseCh {
+		words := strings.Fields(text)
+		for _, word := range words {
+			word = strings.ToLower(word)
+			wordCount[word]++
+		}
+	}
+	wordCountCh <- wordCount
+}
+```
+
+```diff 1:23
+
+```
+
+```diff 4:5
+
+```
+
+```diff 11:14
+
+```
+
+```diff 25:37
+
+```
+
+```diff 35
+
+```
+
+```diff 9
+
+```
+
+```diff 39:49
+
+```
+
+```diff 48
+
+```
+
+```diff 20
+
+```
+
+```diff 1:23
+
+```
+
+</CodeSurfer>
+
+---
+
 <div className="center-slide">
 
 <video width="1600" height="900" autoPlay>
@@ -418,6 +1120,12 @@ TODO
 
 ---
 
+<div className="image-slide">
+  <Image className="image" src={asyncMeme}></Image>
+</div>
+
+---
+
 <div className="center-slide">
 
 <div>
@@ -441,6 +1149,77 @@ TODO
 - Asynchronous programming is a way to handle concurrency without using multiple threads.
 
 </div>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```javascript
+main().catch(console.error);
+
+async function main() {
+  const urls = getURLs();
+  const responses = await fetchURLContent(urls);
+
+  const wordCount = new Map();
+  responses.forEach((response) => updateWordCount(response, wordCount));
+
+  printMostUsedWords(wordCount);
+}
+
+async function fetchURLContent(urls) {
+  const fetch = (await import("node-fetch")).default;
+  const fetchPromises = urls.map((url) => fetch(url).then((res) => res.text()));
+  return Promise.all(fetchPromises);
+}
+
+function updateWordCount(text, wordCount) {
+  const words = text.split(/[ \t\n\r\f]+/).map((word) => word.toLowerCase());
+  words.forEach((word) => {
+    wordCount.set(word, (wordCount.get(word) || 0) + 1);
+  });
+}
+
+function printMostUsedWords(wordCount) {
+  const sortedWords = Array.from(wordCount.entries())
+    .filter((entry) => !IGNORED_WORDS.has(entry[0]))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  sortedWords.forEach(([word, count]) => {
+    console.log(`${word}: ${count}`);
+  });
+}
+```
+
+```diff 3:11
+
+```
+
+```diff 5
+
+```
+
+```diff 13:17
+
+```
+
+```diff 16
+
+```
+
+```diff 7:8
+
+```
+
+```diff 19:24
+
+```
+
+```diff 3:11
+
+```
+
+</CodeSurfer>
 
 ---
 
