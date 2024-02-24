@@ -8,7 +8,6 @@ import "prismjs/components/prism-go";
 import "./styles.css";
 
 import tweet from "./assets/tweet.png";
-import comparisonVid from "./assets/comparison.mp4";
 import comparisonImg from "./assets/comparison.png";
 import channels from "./assets/channels.mp4";
 import graph from "./assets/graph.png";
@@ -61,19 +60,42 @@ Harish Kandala
 
 </div>
 
----
-
-<div className="content-slide">
-
-### About Me
-
-Harish Kandala
-
-Enterprise Engineer @ Meta
-
-TODO
-
-</div>
+<Notes>
+  <div className="notes">
+    <p>Alright, let's get started!</p>
+    <p>Hey everyone, I am Harish Kandala.</p>
+    <p>
+      In this 20 minutes talk, we will go over different concurrency models and
+      try to high level get an understanding of it.
+    </p>
+    <p>
+      We will first go over the question of why concurrency exists in the first
+      place and why do we have so many concurrency models.
+    </p>
+    <p>
+      Then, we'll take a practical problem which can be solved concurrently and
+      we will implement solution for it in different concurrency models.
+    </p>
+    <p>
+      Finally, we will also discuss the biggest question of all - which
+      concurrency model to use?
+    </p>
+    <p>Before diving deeper, a short introduction about me.</p>
+    <p>I work as an Enterprise Engineer at Meta in Amsterdam.</p>
+    <p>
+      I see sometimes people getting confused what Enterprise Engineering really
+      is.
+    </p>
+    <p>Let me try to give a quick one liner intro.</p>
+    <p>
+      Enterprise Engineering at Meta focuses on solving internal problems. We
+      aim to improves the speed and efficiency of metamates by building the
+      right tools at the right time.
+    </p>
+    <p>I hope that clarifies.</p>
+    <p>Let's jump into the topic.</p>
+  </div>
+</Notes>
 
 ---
 
@@ -81,25 +103,83 @@ TODO
   <Image className="image" src={tweet}></Image>
 </div>
 
+<Notes>
+  <div className="notes">
+    <p>Let me start with a tweet I have come across some time ago.</p>
+    <p>
+      I love this because it summarises the essence of concurrency in a single
+      line.
+    </p>
+    <p>
+      And this also demonstrates why we ended up building so many different
+      concurrency models in the first place, right.
+    </p>
+    <p>
+      Fundamentally, concurrency is a hard problem to solve and each model we
+      have come up with is an attempt to solve this problem in a different way.
+    </p>
+    <p>
+      So, let's ask our first question, why concurrency exists in the first
+      place.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div className="content-slide">
 
 ### Why Concurrency?
 
-- The clock speed, the metronome of processors, steadily increased until peaking at 3.7 GHz in 2004. Since then, it has dropped back to around 3 GHz.
+- The clock speed, the metronome of processors, steadily increased until peaking at 3.7 GHz in 2004.
 - The number of transistors on a chip has continued to double every two years, but the power consumption has also doubled.
-- The primary goal of using conccurent programming is to make the most of the available resources.
-
-<br />
+- The primary goal of using concurrent programming is to make the most of the available resources.
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>This dates back to about 20 year ago</p>
+    <p>We all know about Moore's Law, right?</p>
+    <p>
+      Moore's law states that the number of transistors on a chip doubles every
+      two years
+    </p>
+    <p>
+      Even though we were able to increase the number of transistors, we hit the
+      clock speed wall around early 2000s
+    </p>
+    <p>Have you ever wondered why we don't have 10 GHz processors today?</p>
+    <p>
+      We have achievd 3 GHz in mainstream processors in 2004-05 itself but the
+      latest Apple M2 chip still caps around 3.49 GHz.
+    </p>
+  </div>
+</Notes>
 
 ---
 
 <div className="image-slide" style={{ backgroundColor: "white" }}>
   <Image className="image" src={graph}></Image>
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      Well, long story short, what happened is, with the increase in number of
+      transistors, the power consumption also doubled, which increased the heat
+      generated and we hit a wall.
+    </p>
+    <p>
+      If you look at the graph, you can see that the clock speed and power has
+      plateued around 2004-2005.
+    </p>
+    <p>
+      We have to find a way to make the most of the available resources and
+      that's where all these concurrency models come into play.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -113,18 +193,64 @@ TODO
 </div>
 </div>
 
+<Notes>
+  <div className="notes">
+    <p>
+      As Herb Sutter famously puts it in his blog post, "The Free Lunch Is
+      Over", we have got performance gains for free for a long time, but that's
+      not the case anymore.
+    </p>
+    <p>
+      An important note here, I don't mean we didn't have concurrency before
+      2004, but the need for concurrency became more prominent after that.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div className="content-slide">
 
 ### What is Concurrency?
 
-- The dictionary defines concurrency as... <br/> "simultaneous occurrence"
-- Different names like thread, task, or process refer to simultaneous occurrences, all representing a sequence of instructions running in order.
-- It involves breaking down tasks into smaller, independent units that can be executed out-of-order or in partial order, without affecting the final outcome.
+- Concurrency is about composing and coordinating independently executing processes.
+- It is a way to structure a program to handle multiple tasks that could be independent or interdependent.
+- Different names like thread, task, or process refer to the "independently executing process", all representing a sequence of instructions running in order.
 
 <Notes>
-  <div className="notes">lorem ipsum dolor sit amet</div>
+  <div className="notes">
+    <p>That's a bit of short history class there</p>
+    <p>
+      Now, let me give a quick primer on what is concurrency and how it is
+      different from being parallel
+    </p>
+    <p>
+      If you look at the dictionary definition of concurrency, it says
+      "simultaneous occurrence"
+    </p>
+    <p>
+      But when you use the word "concurrently" in a sentence, it usually means
+      like "at the same time"
+    </p>
+    <p>
+      But there is a subtle difference between "at the same time" and
+      "simultaneous occurrence" which usually gets lost when we refer something
+      as concurrent.
+    </p>
+    <p>
+      So, ket's put it formally, Concurrency is about composing and coordinating
+      independently executing processes.
+    </p>
+    <p>
+      When I say "independently executing process" here, I mean it can be
+      anything, be it thread, process, or task. All of them represent a sequence
+      of instructions running in an order.
+    </p>
+    <p>
+      Let's say you have a problem to solve and concurrency provides a way to
+      structure a solution that may be parallelizable but not necessarily.
+    </p>
+  </div>
 </Notes>
 
 </div>
@@ -135,23 +261,31 @@ TODO
 
 ### Concurrency vs Parallelism
 
-As Rob Pike puts it, concurrency is about dealing with lots of things at once while parallelism is about doing lots of things at once.
+As Rob Pike puts it:
 
-- Concurrency: It's a way to structure a program to handle multiple tasks that could be independent or interdependent.
-- Parallelism: It involves performing multiple operations simultaneously, typically using multiple processors or cores.
-
-</div>
-
----
-
-<div className="center-slide">
-
-<video width="1600" height="900" autoPlay loop>
-  <source src={comparisonVid} type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+- Concurrency is about dealing with lots of things at once.
+- Parallelism is about doing lots of things at once.
+- Concurrency is about structure, parallelism is about execution.
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      All the definitions I am using here are from the Rob Pike's amazing talk
+      titled "Concurrency Is Not Parallelism".
+    </p>
+    <p>I strongly recommend you to watch that talk if you haven't already.</p>
+    <p>
+      So, as Rob Pike puts it: Concurrency is about dealing with lots of things
+      at once where as paralleism about doing lot of things at once.
+    </p>
+    <p>
+      Concurrency focuses on structure where as parallelism focuses on
+      execution.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -159,82 +293,91 @@ As Rob Pike puts it, concurrency is about dealing with lots of things at once wh
   <Image className="image" src={comparisonImg}></Image>
 </div>
 
+<Notes>
+  <div className="notes">
+    <p>
+      Let's take a look at a practical example to understand the difference
+      between concurrency and parallelism.
+    </p>
+    <p>
+      Most of the modern web servers are designed to handle multiple requests
+      concurrently.
+    </p>
+    <p>
+      Let's say we have a web server implemented in Node.js which is single
+      threaded.
+    </p>
+    <p>
+      At any point of time, Node.js process would be running only on a single
+      CPU core.
+    </p>
+    <p>
+      But it can handle multiple requests concurrently because of the way it is
+      structured to handle non-blocking I/O.
+    </p>
+    <p>
+      Here, we are not executing multiple requests at the same time, but we are
+      dealing with multiple requests at the same time.
+    </p>
+    <p>
+      And on the other hand, we can also run multiple Node.js processes on
+      multiple CPU cores to handle multiple requests in parallel.
+    </p>
+    <p>
+      This is what when I mean concurrent programs can be parallelized but not
+      necessarily.
+    </p>
+    <p>
+      Again, I strongly recommend you to watch Rob Pike's talk to deep dive into
+      this.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div className="content-slide">
 
 ### What is Concurrency Model?
 
-- A concurrency model is a way of structuring the code to make it easier to write and reason about concurrent programs.
 - It is a way of thinking about concurrency.
 - Concurrency models should be easy to use, understand, and reason about.
 - They are broadly classified into three categories:
 
-  - shared state
+  - shared memory
   - message passing
   - asynchronous programming.
 
 </div>
 
----
-
-<div className="content-slide">
-
-### Shared Mutable State
-
-Shared mutable state works as follows:
-
-- If two or more parties can change the same data (variables, objects, etc.).
-- And if their lifetimes overlap.
-- Then there is a risk of one party's modifications preventing other parties from working correctly.
-
-Shared mutable state is the root of all evil in concurrent programming. It is the cause of most concurrency bugs and performance issues.
-
-</div>
-
----
-
-<CodeSurfer theme={vsDark}>
-
-```java
-public class Account {
-  private int id;
-  private int balance;
-
-  public Account(int id, int balance) {
-    this.id = id;
-    this.balance = balance;
-  }
-
-  public void deposit(int amount) {
-    balance += amount;
-  }
-
-  public void withdraw(int amount) {
-    if (balance >= amount) {
-      balance -= amount;
-    }
-  }
-
-  public int getAccountID() {
-    return id;
-  }
-
-  public int getBalance() {
-    return balance;
-  }
-}
-```
-
-```diff 10:12
-
-```
-
-```diff 14:18
-
-```
-
-</CodeSurfer>
+<Notes>
+  <div className="notes">
+    <p>
+      So, I hope I made it clear by now that concurrency is all about structure
+      and coordination.
+    </p>
+    <p>And we can structure and coordinate in different ways right.</p>
+    <p>
+      Each concurrency model sets the ground rules and provides us tools on how
+      we can structure our program and do any coordination if needed.
+    </p>
+    <p>
+      To simply put, a concurrency model is just a way of thinking about
+      concurrency.
+    </p>
+    <p>It should be easy to use, understand, and reason about.</p>
+    <p>
+      And, all of these different models are all about how we handle shared
+      mutable state.
+    </p>
+    <p>Shared mutable is the root of all evil.</p>
+    <p>
+      We can group these concurrency models broadly intro three categories based
+      on how they handle this evil: shared mutable state.
+    </p>
+    <p>Keep in mind that there are more but these are the most common ones.</p>
+  </div>
+</Notes>
 
 ---
 
