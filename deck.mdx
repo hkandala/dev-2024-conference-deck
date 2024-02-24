@@ -65,8 +65,8 @@ Harish Kandala
     <p>Alright, let's get started!</p>
     <p>Hey everyone, I am Harish Kandala.</p>
     <p>
-      In this 20 minutes talk, we will go over different concurrency models and
-      try to high level get an understanding of it.
+      In the next 20 minutes, we will go over different concurrency models and
+      try to get a high level understanding of it.
     </p>
     <p>
       We will first go over the question of why concurrency exists in the first
@@ -88,9 +88,9 @@ Harish Kandala
     </p>
     <p>Let me try to give a quick one liner intro.</p>
     <p>
-      Enterprise Engineering at Meta focuses on solving internal problems. We
-      aim to improves the speed and efficiency of metamates by building the
-      right tools at the right time.
+      Enterprise Engineering at Meta focuses on building internal tools. We aim
+      to improve the speed and efficiency of metamates by building the right
+      tools at the right time.
     </p>
     <p>I hope that clarifies.</p>
     <p>Let's jump into the topic.</p>
@@ -105,7 +105,7 @@ Harish Kandala
 
 <Notes>
   <div className="notes">
-    <p>Let me start with a tweet I have come across some time ago.</p>
+    <p>I have come across this tweet some time ago.</p>
     <p>
       I love this because it summarises the essence of concurrency in a single
       line.
@@ -139,7 +139,7 @@ Harish Kandala
 
 <Notes>
   <div className="notes">
-    <p>This dates back to about 20 year ago</p>
+    <p>This dates back to about 20 years ago</p>
     <p>We all know about Moore's Law, right?</p>
     <p>
       Moore's law states that the number of transistors on a chip doubles every
@@ -171,11 +171,11 @@ Harish Kandala
       generated and we hit a wall.
     </p>
     <p>
-      If you look at the graph, you can see that the clock speed and power has
+      If you look at this graph, you can see that the clock speed and power has
       plateued around 2004-2005.
     </p>
     <p>
-      We have to find a way to make the most of the available resources and
+      We had to find a way to make the most of the available resources and
       that's where all these concurrency models come into play.
     </p>
   </div>
@@ -221,7 +221,7 @@ Harish Kandala
   <div className="notes">
     <p>That's a bit of short history class there</p>
     <p>
-      Now, let me give a quick primer on what is concurrency and how it is
+      Now, let me give a quick primer on what concurrency is and how it is
       different from being parallel
     </p>
     <p>
@@ -230,15 +230,15 @@ Harish Kandala
     </p>
     <p>
       But when you use the word "concurrently" in a sentence, it usually means
-      like "at the same time"
+      something like "at the same time"
     </p>
     <p>
       But there is a subtle difference between "at the same time" and
-      "simultaneous occurrence" which usually gets lost when we refer something
-      as concurrent.
+      "simultaneous occurrence" which usually gets lost to when we refer
+      something as concurrent.
     </p>
     <p>
-      So, ket's put it formally, Concurrency is about composing and coordinating
+      So, let's put it formally, Concurrency is about composing and coordinating
       independently executing processes.
     </p>
     <p>
@@ -278,10 +278,10 @@ As Rob Pike puts it:
     <p>I strongly recommend you to watch that talk if you haven't already.</p>
     <p>
       So, as Rob Pike puts it: Concurrency is about dealing with lots of things
-      at once where as paralleism about doing lot of things at once.
+      at once where as paralleism is about doing lot of things at once.
     </p>
     <p>
-      Concurrency focuses on structure where as parallelism focuses on
+      Concurrency is all about structure where as parallelism is all about
       execution.
     </p>
   </div>
@@ -296,12 +296,11 @@ As Rob Pike puts it:
 <Notes>
   <div className="notes">
     <p>
-      Let's take a look at a practical example to understand the difference
-      between concurrency and parallelism.
+      Let's take a look at a practical example to understand the difference.
     </p>
     <p>
       Most of the modern web servers are designed to handle multiple requests
-      concurrently.
+      concurrently. Agree?
     </p>
     <p>
       Let's say we have a web server implemented in Node.js which is single
@@ -309,7 +308,7 @@ As Rob Pike puts it:
     </p>
     <p>
       At any point of time, Node.js process would be running only on a single
-      CPU core.
+      CPU core because it is single threaded.
     </p>
     <p>
       But it can handle multiple requests concurrently because of the way it is
@@ -367,8 +366,8 @@ As Rob Pike puts it:
     </p>
     <p>It should be easy to use, understand, and reason about.</p>
     <p>
-      And, all of these different models are all about how we handle shared
-      mutable state.
+      And, all of these different models are all about how we handle this thing
+      called shared mutable state.
     </p>
     <p>Shared mutable is the root of all evil.</p>
     <p>
