@@ -13,6 +13,7 @@ import channels from "./assets/channels.mp4";
 import graph from "./assets/graph.png";
 import locksMeme from "./assets/locks_meme.jpg";
 import asyncMeme from "./assets/async_meme.jpg";
+import locksDiagram from "./assets/locks_diagram.png";
 
 export const theme = {
   googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
@@ -289,7 +290,7 @@ As Rob Pike puts it:
 
 ---
 
-<div className="image-slide" style={{ backgroundColor: "white" }}>
+<div className="image-slide">
   <Image className="image" src={comparisonImg} />
 </div>
 
@@ -583,6 +584,10 @@ public class Main {
 }
 ```
 
+```diff 6
+
+```
+
 ```diff 11:23
 
 ```
@@ -591,7 +596,93 @@ public class Main {
 
 ```
 
+```diff 34
+
+```
+
 </CodeSurfer>
+
+<Notes>
+  <div className="notes">
+    <p>Let's first solve this problem in a single thread.</p>
+    <p>
+      We are using Java here, but the language doesn't matter, solution should
+      be more or less same in any language.
+    </p>
+    <p>
+      I am not showing implementation of getURLs(), but you can assume it just
+      returns all the urls of the API.
+    </p>
+    <p>
+      Let's look into the first part where we are fetching the content of each
+      URL sequentially and storing the responses in a list.
+    </p>
+    <p>
+      We are using Java's HttpClient to make the requests and fetch the
+      responses.
+    </p>
+    <p>
+      Once we have list of responses, we loop through each response, use
+      StringTokenizer to tokenize the content and populate the word count map.
+    </p>
+    <p>
+      StringTokenizer basically splits the strin based on any whitespace
+      character.
+    </p>
+    <p>
+      We have a hashmap to store the word count frequency with word as key and
+      frequency as value.
+    </p>
+    <p>
+      Once we have the word count map, we just need to sort them and print the
+      most used words and that's what printMostUsedWords() does.
+    </p>
+    <p>
+      Seems straightforward, right? But we know that is not very efficient as we
+      are waiting for each request to complete before making the next one.
+    </p>
+  </div>
+</Notes>
+
+---
+
+<div className="image-slide">
+  <Image className="image" src={locksDiagram} />
+</div>
+
+<Notes>
+  <div className="notes">
+    <p>Let's rebuild the solution in a multithreaded world.</p>
+    <p>
+      We can architect the solution in multiple ways, but I am going with one of
+      the most common patterns and that is producer-consumer pattern.
+    </p>
+    <p>
+      Producer consumer pattern is quite simple, we have a set of producer
+      threads which produce some data and put it into a shared queue and we have
+      a set of consumer threads which consume the data from the shared queue and
+      do some processing on it.
+    </p>
+    <p>
+      Note that we are using a blocking queue here, which is a thread-safe queue
+      and it blocks the producer thread if the queue is full and blocks the
+      consumer thread if the queue is empty. We can also use a non-blocking
+      queue here, but for the sake of simplicity, let's go with blocking queue.
+    </p>
+    <p>
+      In our case, the job of producer threads is to fetch the content of each
+      URL which is the session abstract and push the response to the queue.
+    </p>
+    <p>
+      And the job of consumer threads is to consume the response from the queue,
+      tokenize the content and populate the word count map.
+    </p>
+    <p>
+      Here, the word count map is the shared mutable state which we talked about
+      earlier.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -664,6 +755,10 @@ public class Main {
 ```
 
 ```diff 32:48
+
+```
+
+```diff 41
 
 ```
 
@@ -852,6 +947,10 @@ public class Main {
 
 </CodeSurfer>
 
+<Notes>
+  <div className="notes">- Let's see some code now.</div>
+</Notes>
+
 ---
 
 <CodeSurfer theme={vsDark}>
@@ -969,20 +1068,7 @@ public class AccountManager {
 
 <div class="content-slide">
 
-### Pros
-
-- Familiarity
-- Control
-- Performance
-- Flexibility
-
-</div>
-
----
-
-<div class="content-slide">
-
-### Cons
+### Trade Offs
 
 - Complexity
 - Scalability
