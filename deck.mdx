@@ -384,7 +384,7 @@ As Rob Pike puts it:
 
 <div>
 
-### Locks and Synchronization
+### Shared Memory Synchronization
 
 (a.k.a let's find a workaround to handle shared state)
 
@@ -392,27 +392,153 @@ As Rob Pike puts it:
 
 </div>
 
+<Notes>
+  <div className="notes">
+    <p>Okay, let's start with the first one, shared memory synchronization.</p>
+    <p>
+      I mean the terminology used might seem bit strange but I am sure you all
+      are familiar with semaphore or locks, right?
+    </p>
+    <p>
+      Here, we are accepting the fact that we have shared mutable state and we
+      are trying to use some tools or I would say a workaround to handle them.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div class="content-slide">
 
 ### What and How?
 
-- Locks are a way to prevent multiple threads from accessing shared state at the same time.
-- Synchronization is a way to ensure that only one thread can access shared state at a time.
-- Locks and synchronization are the most common way to handle shared state.
+- A synchronization primitive is any structure that attempts to control the order of your code and prevent race conditions.
+- The most simple synchronization primitive is known as the lock, but there are many others like semaphores, monitors, etc.
+- These synchronization primitives are of two types: blocking and non-blocking.
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      Because we have shared mutable state, multiple threads can access this
+      shared state at the same time and that's not actually good as we might end
+      up in race conditions.
+    </p>
+    <p>
+      Anyone who worked on concurrent systems would tell you that race
+      conditions are the worst to debug and fix.
+    </p>
+    <p>
+      So to avoid these race conditions we need to synchronize this shared
+      memory access, ensuring that only one thread can access it at a time.
+    </p>
+    <p>
+      Well, we can achieve that using these synchronization primitives like
+      locks, semaphores, or monitors controlling access to critical sections.
+    </p>
+    <p>
+      I won't go into the details of these as I assume most of you are familiar
+      with them already.
+    </p>
+    <p>
+      And these synchronization primitives can be categorized into two types:
+      blocking and non-blocking.
+    </p>
+    <p>
+      Note that this blocking and non-blocking not just applies to
+      synchronization primitives but also to any concurrency algorithm, I bet
+      you might have heard of these terms in the context of I/O operations as
+      well like blocking I/O and non-blocking I/O.
+    </p>
+    <p>
+      In general, we can categorize any concurrency algorithm into blocking and
+      non-blocking.
+    </p>
+    <p>
+      A blocking concurrency algorithm is basically either performs the action
+      requested by the thread or blocks the thread until the action can be
+      performed safely.
+    </p>
+    <p>
+      Where as a non-blocking concurrency algorithm either performs the action
+      requested by the thread or notifies the requesting thread that the action
+      could not be performed
+    </p>
+    <p>
+      So the difference is in how they handle the situation when the action
+      can't be performed immediately.
+    </p>
+    <p>
+      In the context of synchronization primitives locks, mutexes, and
+      semaphores are all examples of blocking concurrency algorithms.
+    </p>
+    <p>
+      Atomic operations like AtomicInteger or AtomicBoolean in Java or any other
+      lock-free data structures are examples of non-blocking concurrency
+      algorithms.
+    </p>
+  </div>
+</Notes>
 
 ---
 
 <div class="content-slide">
 
-### Word Frequency Counter
+### What is the most used word in all session abstracts of this conference?
 
-TODO
+- Identify the most used word in conference session abstracts, utilizing a custom node.js server API for data retrieval.
+- Extract all the session abstacts by making 135 requests to the API, tokenize them, and count the words.
+- Note that this is just for demonstration and concurrency is complete overkill for this problem.
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      Most of you would be already feeling like: "this is too much theory, show
+      me some code man".
+    </p>
+    <p>I hear you guys, let's take a practical problem and solve it.</p>
+    <p>
+      I spent a lot of time in figuring out which would be a good example to
+      demonstrate, I hope this one is good.
+    </p>
+    <p>
+      So, the problem is simple - I want to know the most used word in all
+      session abstracts of this conference.
+    </p>
+    <p>
+      All of you would have already visited devworldconference.com and if you go
+      to program page, you can see all the session abstracts.
+    </p>
+    <p>
+      A simple reverse engineering led me to an API which has all the session
+      abstracts.
+    </p>
+    <p>
+      But I am a responsible developer and I don't want to bombard their server
+      with too many requests.
+    </p>
+    <p>
+      So, I copied the data and created a simple node.js server where given an
+      id of a session, it returns the abstract.
+    </p>
+    <p>
+      Alright, so now we have an API where given an id of a session, it returns
+      the abstract, and there are 135 sessions in total.
+    </p>
+    <p>
+      All we need to do is call this API 135 times, get the abstracts, tokenize
+      them, and count the words. Simple right?
+    </p>
+    <p>
+      And note that I understand that this is a very simple problem, we can
+      solve it in a single thread as well and concurrency is complete overkill,
+      but for the sake of demonstration, let's solve it concurrently.
+    </p>
+  </div>
+</Notes>
 
 ---
 
