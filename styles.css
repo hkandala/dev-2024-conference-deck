@@ -16,11 +16,7 @@ li {
   align-items: center;
   height: 100vh;
   font-size: 2em;
-}
-
-.quote-slide blockquote {
-  text-align: center;
-  margin: 0;
+  font-weight: bold;
 }
 
 .quote-slide .reference {
