@@ -1642,7 +1642,10 @@ public class OrchestratorActor extends AbstractActor {
     <p>
       One good thing here in actor model is that we don't have shared mutable
       state, and we don't have to worry about things like deadlocks, livelocks,
-      thread contention, etc.
+      thread contention, etc. One short caveat here is that there are some very
+      rare cases where we can end up in a deadlock in languages like Erlang, but
+      it's not a common problem and you have to explicitly write code to end up
+      in a deadlock.
     </p>
     <p>
       But, it's not all sunshine and rainbows, there are trade-offs in
