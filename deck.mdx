@@ -14,6 +14,7 @@ import graph from "./assets/graph.png";
 import locksMeme from "./assets/locks_meme.jpg";
 import asyncMeme from "./assets/async_meme.jpg";
 import locksDiagram from "./assets/locks_diagram.png";
+import actorDiagram from "./assets/actor_diagram.png";
 
 export const theme = {
   googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
@@ -326,6 +327,12 @@ As Rob Pike puts it:
     <p>
       This is what when I mean concurrent programs can be parallelized but not
       necessarily.
+    </p>
+    <p>
+      Also all the four combinations are possible if that makes sense. What I
+      mean is: an application can be concurrent and parallel, concurrent and not
+      parallel, parallel and not concurrent, and neither concurrent nor
+      parallel.
     </p>
     <p>
       Again, I strongly recommend you to watch Rob Pike's talk to deep dive into
@@ -750,6 +757,14 @@ public class Main {
 
 ```
 
+```diff 6
+
+```
+
+```diff 8
+
+```
+
 ```diff 18:30
 
 ```
@@ -945,10 +960,72 @@ public class Main {
 }
 ```
 
+```diff
+
+```
+
 </CodeSurfer>
 
 <Notes>
-  <div className="notes">- Let's see some code now.</div>
+  <div className="notes">
+    <p>Let's see some code now.</p>
+    <p>
+      We need to have two thread pools, one for producers and one for consumers.
+    </p>
+    <p>We are using Java's ExecutorService to create thread pools.</p>
+    <p>
+      Again, every language has its own way of creating thread pools, but the
+      concept is same.
+    </p>
+    <p>
+      We are initializing the blocking queue here which is to communicate
+      between producer and consumer threads.
+    </p>
+    <p>
+      We are also initializing the word count map which is our shared mutable
+      state for all the consumer threads.
+    </p>
+    <p>
+      Now we loop over each url and submit a task to the producer thread pool
+      which is the same piece of code we had in the single threaded solution.
+    </p>
+    <p>
+      Similarly, we create multiple consumers which listen to the queue and
+      process the word count.
+    </p>
+    <p>
+      And that's it, we basically created multiple producer threads and consumer
+      threads and accessing and updating the shared memory.
+    </p>
+    <p>
+      But there is a problem here, we are accessing the shared mutable state
+      without any synchronization.
+    </p>
+    <p>This critical section code can lead to race conditions.</p>
+    <p>
+      As discussed earlier, we can use locks to synchronize the access to the
+      shared mutable state.
+    </p>
+    <p>Let's add a ReentrantLock and synchronize the critical section.</p>
+    <p>That's it, now our code is thread safe and free from race conditions.</p>
+    <p>
+      We can also use synchronized block in Java which internally uses monitor
+      locks. It's just another way of doing the same thing.
+    </p>
+    <p>
+      And that's it, we have solved the problem concurrently using shared memory
+      synchronization.
+    </p>
+    <p>I mean it seems quite simple, right?</p>
+    <p>
+      We just need to throw a lock on the critical section and we are good to
+      go.
+    </p>
+    <p>But, it's not that simple all the time.</p>
+    <p>
+      Let's take another example to see how it can become complex very quickly.
+    </p>
+  </div>
 </Notes>
 
 ---
@@ -1064,24 +1141,108 @@ public class AccountManager {
 
 </CodeSurfer>
 
+<Notes>
+  <div className="notes">
+    <p>
+      Here we are trying to implement transferMoney method which does money
+      transfer between two accounts.
+    </p>
+    <p>
+      We have from account and a to account, we need to check if from account
+      has enough balance and then debit from from account and credit to to
+      account.
+    </p>
+    <p>
+      This is all good, but you might have already noticed it is not thread
+      safe.
+    </p>
+    <p>
+      We are doing a check then do the money transfer which is a classic example
+      of check-then-act and it is not thread safe.
+    </p>
+    <p>
+      So, like we did before let's throw a lock on the critical section and see
+      what happens.
+    </p>
+    <p>
+      Note that we need to synchronize on both accounts as we are accessing both
+      of them.
+    </p>
+    <p>However, we can end up in a deadlock situation here.</p>
+    <p>
+      Let's say we have two threads, one trying to transfer money from account A
+      to account B and another trying to transfer money from account B to
+      account A.
+    </p>
+    <p>
+      Both of them are trying to acquire locks in opposite order and we can end
+      up in a deadlock.
+    </p>
+    <p>
+      And the solution to this is to ensure lock ordering, such that we always
+      acquire locks in the same order.
+    </p>
+    <p>
+      We can do lock ordering based on some property of the account, like
+      account number here.
+    </p>
+    <p>Now we should be good.</p>
+    <p>
+      Well, the reason I am showing this is to make a point that shared memory
+      synchronization can become complex very quickly.
+    </p>
+    <p>
+      Even for a simple debit and credit operation, we need to be very careful
+      about how we acquire locks to avoid deadlocks.
+    </p>
+    <p>
+      Now imagine I am building a complex payment service at Facebook scale like
+      WhatsApp Pay, things can get very complex very quickly and not easily
+      manageable.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div class="content-slide">
 
-### Trade Offs
+### Trade-offs
 
-- Complexity
-- Scalability
+- Deadlocks
+- Over-synchronization or Thread Contention
 - Debugging Difficulty
 - Portability
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      And it's not just about deadlocks, there are many other problems like
+      livelocks, thread contention, priority inversion and the list goes on.
+    </p>
+    <p>
+      And these are some of the common trade-offs we need to consider when using
+      shared memory synchronization.
+    </p>
+  </div>
+</Notes>
 
 ---
 
 <div className="image-slide">
   <Image className="image" src={locksMeme} />
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      Now that we understand the trade-offs, let's see how other models handle
+      shared mutable state.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -1097,18 +1258,108 @@ public class AccountManager {
 
 </div>
 
+<Notes>
+  <div className="notes">
+    <p>Let's look into the second concurrency model, the actor model.</p>
+  </div>
+</Notes>
+
 ---
 
 <div class="content-slide">
 
 ### What and How?
 
-- The actor model is a way to structure a program to handle multiple tasks that could be independent or interdependent.
 - It is based on the idea of actors, which are independent entities that communicate with each other by sending messages.
 - Actors are the fundamental unit of computation in the actor model.
 - The actor model is a message passing model.
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>Here we avoid shared mutable state altogether.</p>
+    <p>
+      We don't worry about threads, fundamental unit of computation is an actor.
+    </p>
+    <p>
+      Depending on the language, the actor framework will take care of the
+      underlying threads and scheduling.
+    </p>
+    <p>
+      Actors are independent entities that communicate with each other by
+      sending messages.
+    </p>
+    <p>
+      They have their own state and they can only communicate with each other by
+      sending messages.
+    </p>
+    <p>This falls under the category of message passing model.</p>
+    <p>
+      Most of the modern programming languages have some sort of actor
+      framework.
+    </p>
+    <p>
+      And in fact, languages like Erlang and Elixir have built-in support for
+      the actor model. If you might have heard, WhatsApp is built on Erlang.
+      It's a great example of how actor model can be used to build highly
+      concurrent and fault-tolerant systems. WhatsApp has also published a post
+      sometime in 2012 about how they scaled to 2 million connections per server
+      using Erlang.
+    </p>
+  </div>
+</Notes>
+
+---
+
+<div className="image-slide" style={{ padding: "1em" }}>
+  <Image className="image" src={actorDiagram} />
+</div>
+
+<Notes>
+  <div className="notes">
+    <p>Let's arhitect the same problem using the actor model.</p>
+    <p>
+      In our actor system, we have three types of actors: URLFetcher,
+      WordCounter, and Orchestrator actor.
+    </p>
+    <p>Their names pretty much explain what they do.</p>
+    <p>URLFetcher actor is responsible for fetching the content of each URL.</p>
+    <p>
+      WordCounter actor is responsible for counting the words in the content.
+    </p>
+    <p>Orchestrator actor is responsible for coordinating the whole process.</p>
+    <p>Our word count map is now the state of WordCounter actor.</p>
+    <p>
+      We are not sharing the word count map between actors, but we are sending
+      messages to the WordCounter actor to update its state.
+    </p>
+    <p>
+      This is the fundamental difference between shared memory synchronization
+      and actor model.
+    </p>
+    <p>
+      On a high level, orchestrator actor creates new URLFetcher actor for each
+      URL and sends a message to fetch the content.
+    </p>
+    <p>
+      Each inidividual URLFetcher actor fetches response by making a HTTP call
+      concurrently and sends a message to WordCounter actor once it's done.
+    </p>
+    <p>
+      WordCounter actor counts the words and sends a message to Orchestrator
+      indicating that it has processed one URL.
+    </p>
+    <p>
+      Once all the URLs are processed, Orchestrator actor sends a message to
+      WordCounter actor to print the results.
+    </p>
+    <p>
+      And that's it, we just re-architected the same problem using the actor
+      model.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -1164,6 +1415,38 @@ public class URLFetcherActor extends AbstractActor {
 
 </CodeSurfer>
 
+<Notes>
+  <div className="notes">
+    <p>Let's quickly look at the code for this.</p>
+    <p>
+      I am using akka framework in Java for this, like I mentioned, most of the
+      modern programming languages have some sort of actor framework that you
+      can use.
+    </p>
+    <p>
+      This code is slightly exhaustive and I will try to skim through it
+      covering the important parts.
+    </p>
+    <p>So, let's start with the URLFetcher actor.</p>
+    <p>
+      createReceive() is the method where we define the message handlers for any
+      actor.
+    </p>
+    <p>
+      In this case URLFetcher actor has only one message handler which is
+      onFetch.
+    </p>
+    <p>
+      Now if we look at onFetch, it is pretty much a simple http call to fetch
+      the content of the URL.
+    </p>
+    <p>
+      Only important part here is, once we have the response, we send a message
+      to WordCounter actor to count the words.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <CodeSurfer theme={vsDark}>
@@ -1207,6 +1490,10 @@ public class WordCounterActor extends AbstractActor {
 }
 ```
 
+```diff 18
+
+```
+
 ```diff 20:26
 
 ```
@@ -1220,6 +1507,33 @@ public class WordCounterActor extends AbstractActor {
 ```
 
 </CodeSurfer>
+
+<Notes>
+  <div className="notes">
+    <p>Now let's look at the WordCounter actor.</p>
+    <p>
+      Remember from the architecture diagram, we have only one word counter
+      actor which is responsible for counting the words in the content.
+    </p>
+    <p>
+      So, we are going to declare our word count map which will be the state of
+      this actor.
+    </p>
+    <p>And coming to message handlers, we have two message handlers here.</p>
+    <p>
+      onCountWords is the message handler which is responsible for counting the
+      words in the content.
+    </p>
+    <p>
+      Once we have the word count, we send a ProcessComplete message to
+      Orchestrator actor indicating that we have processed one URL.
+    </p>
+    <p>
+      I am not showing the onPrintResults message handler here, but it's pretty
+      straightforward, it just prints the most used words.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -1280,25 +1594,40 @@ public class OrchestratorActor extends AbstractActor {
 
 </CodeSurfer>
 
+<Notes>
+  <div className="notes">
+    <p>And the last actor is the Orchestrator actor.</p>
+    <p>
+      Like we discussed, Orchestrator actor is responsible for coordinating the
+      whole process and maintains all other actors.
+    </p>
+    <p>
+      We initialise the WordCounter actor and create one URLFetcher actors for
+      each URL and send a message to them to fetch.
+    </p>
+    <p>
+      And looking at message handlers for this, we have one message handles for
+      ProcessComplete message which is sent by WordCounter actor once it has
+      processed one URL.
+    </p>
+    <p>
+      So, if we look at its implementation, it just increments the completed
+      count and once all the URLs are processed, it sends a message to
+      WordCounter actor to print the results.
+    </p>
+    <p>
+      Okay that' lot of code. Don't worry about implementation details as it's
+      not very important and changes with language, the important part is the
+      architecture and how we are using actors to solve the problem.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div class="content-slide">
 
-### Pros
-
-- Simplicity
-- Scalability
-- Isolation
-- Fault Tolerance
-- Asynchronous Communication
-
-</div>
-
----
-
-<div class="content-slide">
-
-### Cons
+### Trade-offs
 
 - Overhead
 - Complexity in State Management
@@ -1307,6 +1636,34 @@ public class OrchestratorActor extends AbstractActor {
 - Limited Control
 
 </div>
+
+<Notes>
+  <div className="notes">
+    <p>
+      One good thing here in actor model is that we don't have shared mutable
+      state, and we don't have to worry about things like deadlocks, livelocks,
+      thread contention, etc.
+    </p>
+    <p>
+      But, it's not all sunshine and rainbows, there are trade-offs in
+      everything and actor model is no exception.
+    </p>
+    <p>
+      First, there is overhead of creating and managing actors, and message
+      passing.
+    </p>
+    <p>
+      There is complexity in state management, as we need to manage the state of
+      each actor and the messages they send and receive.
+    </p>
+    <p>There is a learning curve and difficulty in debygging as well.</p>
+    <p>
+      And we have limited control over the underlying threads and scheduling, so
+      if you want to get more control over the concurrency, actor model might
+      not be the best choice.
+    </p>
+  </div>
+</Notes>
 
 ---
 
