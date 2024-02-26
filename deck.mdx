@@ -8,13 +8,16 @@ import "prismjs/components/prism-go";
 import "./styles.css";
 
 import tweet from "./assets/tweet.png";
-import comparisonImg from "./assets/comparison.png";
-import channels from "./assets/channels.mp4";
 import graph from "./assets/graph.png";
-import locksMeme from "./assets/locks_meme.jpg";
-import asyncMeme from "./assets/async_meme.jpg";
-import locksDiagram from "./assets/locks_diagram.png";
-import actorDiagram from "./assets/actor_diagram.png";
+import channels from "./assets/channels.mp4";
+import comparisonDiagram from "./assets/excalidraw/comparison_diagram.png";
+import locksDiagram from "./assets/excalidraw/locks_diagram.png";
+import actorDiagram from "./assets/excalidraw/actor_diagram.png";
+import channelsDiagram from "./assets/excalidraw/channels_diagram.png";
+import asyncDiagram from "./assets/excalidraw/async_diagram.png";
+import locksMeme from "./assets/memes/locks_meme.jpg";
+import asyncMeme from "./assets/memes/async_meme.jpg";
+import channelsMeme from "./assets/memes/channels_meme.jpg";
 
 export const theme = {
   googleFont: "https://fonts.googleapis.com/css?family=IBM+Plex+Mono",
@@ -292,7 +295,7 @@ As Rob Pike puts it:
 ---
 
 <div className="image-slide">
-  <Image className="image" src={comparisonImg} />
+  <Image className="image" src={comparisonDiagram} />
 </div>
 
 <Notes>
@@ -1670,6 +1673,12 @@ public class OrchestratorActor extends AbstractActor {
 
 ---
 
+<div className="image-slide">
+  <Image className="image" src={channelsMeme} />
+</div>
+
+---
+
 <div className="center-slide">
 
 <div>
@@ -1688,11 +1697,16 @@ public class OrchestratorActor extends AbstractActor {
 
 ### What and How?
 
-- Communicating Sequential Processes (CSP) is a way to structure a program to handle multiple tasks that could be independent or interdependent.
 - It is based on the idea of channels, which are independent entities that communicate with each other by sending messages.
 - Channels are the fundamental unit of computation in the CSP model.
 - The CSP model is a message passing model.
 
+</div>
+
+---
+
+<div className="image-slide">
+  <Image className="image" src={channelsDiagram} />
 </div>
 
 ---
@@ -1852,70 +1866,49 @@ func countWords(responseCh <-chan string, wordCountCh chan<- map[string]int) {
 
 ---
 
+<div className="image-slide" style={{ padding: "1em" }}>
+  <Image className="image" src={asyncDiagram} />
+</div>
+
+---
+
 <CodeSurfer theme={vsDark}>
 
 ```javascript
-main().catch(console.error);
+async function main(): Awaitable<void> {
+  $urls = getURLs();
 
-async function main() {
-  const urls = getURLs();
-  const responses = await fetchURLContent(urls);
+  $responses = await Vec\map_async($urls, async $url ==> {
+    $request = CurlHTTPRequest::fromURI(
+      $url,
+      CurlType::EXTERNAL,
+      CurlClient::FETCH_URL_CONTENT,
+    );
+    $result = await $request->gen();
+    if ($result) {
+      return $request->getResponseBody();
+    }
+    return null;
+  })
+    |> Vec\filter_nulls($$);
 
-  const wordCount = new Map();
-  responses.forEach((response) => updateWordCount(response, wordCount));
+  $wordCount = dict[];
+  foreach ($responses as $response) {
+    $words = Str\split($response, ' ');
+    foreach ($words as $word) {
+      $wordCount[$word] = idx($wordCount, $word, 0) + 1;
+    }
+  }
 
-  printMostUsedWords(wordCount);
-}
-
-async function fetchURLContent(urls) {
-  const fetch = (await import("node-fetch")).default;
-  const fetchPromises = urls.map((url) => fetch(url).then((res) => res.text()));
-  return Promise.all(fetchPromises);
-}
-
-function updateWordCount(text, wordCount) {
-  const words = text.split(/[ \t\n\r\f]+/).map((word) => word.toLowerCase());
-  words.forEach((word) => {
-    wordCount.set(word, (wordCount.get(word) || 0) + 1);
-  });
-}
-
-function printMostUsedWords(wordCount) {
-  const sortedWords = Array.from(wordCount.entries())
-    .filter((entry) => !IGNORED_WORDS.has(entry[0]))
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
-  sortedWords.forEach(([word, count]) => {
-    console.log(`${word}: ${count}`);
-  });
+  printMostUsedWords($wordCount);
 }
 ```
 
-```diff 3:11
+```diff 4:16
 
 ```
 
-```diff 5
-
-```
-
-```diff 13:17
-
-```
-
-```diff 16
-
-```
-
-```diff 7:8
-
-```
-
-```diff 19:24
-
-```
-
-```diff 3:11
+```diff 18:24
 
 ```
 
