@@ -1275,7 +1275,8 @@ public class AccountManager {
 
 - It is based on the idea of actors, which are independent entities that communicate with each other by sending messages.
 - Actors are the fundamental unit of computation in the actor model.
-- The actor model is a message passing model.
+- Actors can be distributed across multiple machines and they can only communicate with each other by sending messages.
+- Erlang and Elixir have built-in support for the actor model.
 
 </div>
 
@@ -1321,7 +1322,7 @@ public class AccountManager {
 
 <Notes>
   <div className="notes">
-    <p>Let's arhitect the same problem using the actor model.</p>
+    <p>Let's architect the same problem using the actor model.</p>
     <p>
       In our actor system, we have three types of actors: URLFetcher,
       WordCounter, and Orchestrator actor.
@@ -1697,9 +1698,10 @@ public class OrchestratorActor extends AbstractActor {
 
 ### What and How?
 
-- It is based on the idea of channels, which are independent entities that communicate with each other by sending messages.
-- Channels are the fundamental unit of computation in the CSP model.
-- The CSP model is a message passing model.
+- Communicating Sequential Processes (CSP) is a formal language for describing patterns of interaction in concurrent systems developed in 1978 by Tony Hoare.
+- Processes and channels are the fundamental unit of computation in the CSP model.
+- Communication can be synchronous or asynchronous depending on the implementation in the language.
+- Go and Clojure are two popular languages that have built-in support for CSP.
 
 </div>
 
@@ -1824,11 +1826,10 @@ func countWords(responseCh <-chan string, wordCountCh chan<- map[string]int) {
 
 ### Trade-offs
 
-- Performance Overhead
-- Complexity in Debugging
+- Overhead
+- Complexity in State Management
 - Learning Curve
-- Potential for Bottlenecks
-- Limited by Language Support
+- Debugging Difficulty
 
 </div>
 
