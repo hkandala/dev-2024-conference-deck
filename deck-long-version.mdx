@@ -8,11 +8,16 @@ import "prismjs/components/prism-go";
 import "./styles.css";
 
 import tweet from "./assets/tweet.png";
+import graph from "./assets/graph.png";
+import channels from "./assets/channels.mp4";
+import comparisonDiagram from "./assets/excalidraw/comparison_diagram.png";
 import locksDiagram from "./assets/excalidraw/locks_diagram.png";
 import actorDiagram from "./assets/excalidraw/actor_diagram.png";
+import channelsDiagram from "./assets/excalidraw/channels_diagram.png";
 import asyncDiagram from "./assets/excalidraw/async_diagram.png";
 import locksMeme from "./assets/memes/locks_meme.jpg";
 import asyncMeme from "./assets/memes/async_meme.jpg";
+import channelsMeme from "./assets/memes/channels_meme.jpg";
 import aiMeme from "./assets/memes/ai_meme.jpg";
 import qrCode from "./assets/qr_code.png";
 
@@ -63,47 +68,41 @@ Harish Kandala
 
 </div>
 
-<Notes>
-  <div class="notes">
-    <p>Greetings and Intro</p>
-    <p>Relatively new to Amsterdam</p>
-    <p>Haven't biked in the rain yet</p>
-  </div>
-</Notes>
-
 ---
 
 <div className="image-slide">
   <Image className="image" src={tweet} />
 </div>
 
-<Notes>
-  <div class="notes">
-    <p>
-      Interestingly enough, when I came across this tweet, I was breaking my
-      head around a concurreny related problem at work
-    </p>
-    <p>
-      Conccurency always used to baffle me and I had a hard time wrapping my
-      head around it.
-    </p>
-    <p>
-      It was a good reminder that concurrency is hard and it is not just me who
-      finds it hard
-    </p>
-    <p>
-      And since then, I got an opportunity to work on multiple concurrent
-      problems in different programming languages
-    </p>
-    <p>
-      And I thought it would be a good idea to share my learnings with you all
-    </p>
-    <p>
-      In the next 20 mins, we will go over different concurrency models and try
-      to get a holistic understanding of it.
-    </p>
-  </div>
-</Notes>
+---
+
+<div className="content-slide">
+
+### Why Concurrency?
+
+- The clock speed, the metronome of processors, steadily increased until peaking at 3.7 GHz in 2004.
+- The number of transistors on a chip has continued to double every two years, but the power consumption has also doubled.
+- The primary goal of using concurrent programming is to make the most of the available resources.
+
+</div>
+
+---
+
+<div className="image-slide" style={{ backgroundColor: "white" }}>
+  <Image className="image" src={graph} />
+</div>
+
+---
+
+<div className="quote-slide">
+<div>
+
+"The Free Lunch Is Over"
+
+<div className="reference">- Herb Sutter</div>
+
+</div>
+</div>
 
 ---
 
@@ -116,18 +115,6 @@ Harish Kandala
 - Different names like thread, task, or process refer to the "independently executing process", all representing a sequence of instructions running in order.
 
 </div>
-
-<Notes>
-  <div class="notes">
-    <p>Simultaneous occurrence</p>
-    <p>At the same time</p>
-    <p>Composing and coordinating independently executing processes</p>
-    <p>
-      Concurrency provides a way to structure a solution that may be
-      parallelizable but not necessarily
-    </p>
-  </div>
-</Notes>
 
 ---
 
@@ -143,11 +130,11 @@ As Rob Pike puts it:
 
 </div>
 
-<Notes>
-  <div class="notes">
-    <p>Concurrency is not Parallelism talk credit</p>
-  </div>
-</Notes>
+---
+
+<div className="image-slide" style={{ padding: "1.25em" }}>
+  <Image className="image" src={comparisonDiagram} />
+</div>
 
 ---
 
@@ -164,28 +151,6 @@ As Rob Pike puts it:
   - asynchronous programming.
 
 </div>
-
-<Notes>
-  <div class="notes">
-    <p>
-      It's all about structure and coordination and we can do that in many ways
-    </p>
-    <p>
-      Concurrency model sets the ground rules and tools on how we can structure
-      and co-oridnate
-    </p>
-    <p>
-      And if you look at it each concurrency provides different solutions to
-      handle shared mutable state
-    </p>
-    <p>Shared mutable state is the root of all evil</p>
-    <p>
-      We can categorize these models into three categories based on how they
-      handle this evil
-    </p>
-    <p>Keep in mind there are more but these are the most common ones</p>
-  </div>
-</Notes>
 
 ---
 
@@ -567,6 +532,119 @@ public class Main {
 
 ---
 
+<CodeSurfer theme={vsDark}>
+
+```java
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        if (from.getBalance() < amount)
+            throw new InsufficientBalanceException(...);
+        from.debit(amount);
+        to.credit(amount);
+    }
+}
+```
+
+```java 4:9
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Unsafe check-then-act
+        if (from.getBalance() < amount)
+            throw new InsufficientBalanceException(...);
+        from.debit(amount);
+        to.credit(amount);
+    }
+}
+```
+
+```java
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:12
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:13
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // However, this can lead to deadlock
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```java 4:12
+public class AccountManager {
+    public static void transferMoney(Account from, Account to, int amount)
+        throws InsufficientBalanceException {
+        // Ensure lock ordering to avoid deadlock
+        Account first, second;
+        if (from.getAccountNumber() < to.getAccountNumber()) {
+            first = from;
+            second = to;
+        } else {
+            first = to;
+            second = from;
+        }
+
+        // Synchronize on both accounts
+        synchronized(from) {
+            synchronized(to) {
+                if (from.getBalance() < amount)
+                    throw new InsufficientBalanceException(...);
+                from.debit(amount);
+                to.credit(amount);
+            }
+        }
+    }
+}
+```
+
+```diff
+
+```
+
+</CodeSurfer>
+
+---
+
 <div class="content-slide">
 
 ### Trade-offs
@@ -806,6 +884,163 @@ public class OrchestratorActor extends AbstractActor {
 ---
 
 <div className="image-slide">
+  <Image className="image" src={channelsMeme} />
+</div>
+
+---
+
+<div className="center-slide">
+<div>
+
+### Communicating Sequential Processes
+
+(a.k.a yet another message passing model)
+
+</div>
+</div>
+
+---
+
+<div class="content-slide">
+
+### What and How?
+
+- Communicating Sequential Processes (CSP) is a formal language for describing patterns of interaction in concurrent systems developed in 1978 by Tony Hoare.
+- Processes and channels are the fundamental unit of computation in the CSP model.
+- Communication can be synchronous or asynchronous depending on the implementation in the language.
+- Go and Clojure are two popular languages that have built-in support for CSP.
+
+</div>
+
+---
+
+<div className="image-slide">
+  <Image className="image" src={channelsDiagram} />
+</div>
+
+---
+
+<CodeSurfer theme={vsDark}>
+
+```go
+func main() {
+	urls := getURLs()
+
+	responseCh := make(chan string)
+	wordCountCh := make(chan map[string]int)
+
+	var wg sync.WaitGroup
+
+	go countWords(responseCh, wordCountCh)
+
+	for _, url := range urls {
+		wg.Add(1)
+		go fetchURL(url, responseCh, &wg)
+	}
+
+	wg.Wait()
+
+	close(responseCh)
+
+	wordCount := <-wordCountCh
+
+	printMostUsedWords(wordCount)
+}
+
+func fetchURL(url string, responseCh chan<- string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Failed to fetch %s: %v\n", url, err)
+		return
+	}
+	defer resp.Body.Close()
+	scanner := bufio.NewScanner(resp.Body)
+	for scanner.Scan() {
+		responseCh <- scanner.Text()
+	}
+}
+
+func countWords(responseCh <-chan string, wordCountCh chan<- map[string]int) {
+	wordCount := make(map[string]int)
+	for text := range responseCh {
+		words := strings.Fields(text)
+		for _, word := range words {
+			word = strings.ToLower(word)
+			wordCount[word]++
+		}
+	}
+	wordCountCh <- wordCount
+}
+```
+
+```diff 1:23
+
+```
+
+```diff 4:5
+
+```
+
+```diff 11:14
+
+```
+
+```diff 25:37
+
+```
+
+```diff 35
+
+```
+
+```diff 9
+
+```
+
+```diff 39:49
+
+```
+
+```diff 48
+
+```
+
+```diff 20
+
+```
+
+```diff 1:23
+
+```
+
+</CodeSurfer>
+
+---
+
+<div className="center-slide" style={{ backgroundColor: "white" }}>
+  <video width="1600" height="900" autoPlay>
+    <source src={channels} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+---
+
+<div class="content-slide">
+
+### Trade-offs
+
+- Overhead
+- Complexity in state management
+- Learning curve
+- Debugging difficulty
+
+</div>
+
+---
+
+<div className="image-slide">
   <Image className="image" src={asyncMeme} />
 </div>
 
@@ -911,6 +1146,12 @@ async function main(): Awaitable<void> {
 
 ---
 
+<div className="image-slide">
+  <Image className="image" src={channelsDiagram} />
+</div>
+
+---
+
 <div className="image-slide" style={{ padding: "1em" }}>
   <Image className="image" src={asyncDiagram} />
 </div>
@@ -922,11 +1163,23 @@ async function main(): Awaitable<void> {
 ### Which one to use?
 
 - It depends.
-- Eliminate shared mutable state as much as possible.
-- If your application is I/O-heavy, prefer asynchronous programming when possible.
 - Concurrency is hard, so minimize the amount of code that has to deal with concurrency.
+- Eliminate shared mutable state as much as possible.
 - Always measure and check if concurrency benefits outweigh the complexity.
+- If your application is I/O-heavy, asynchronous programming might be a good choice.
 
+</div>
+
+---
+
+<div className="quote-slide" style={{fontSize: "1.5em"}}>
+<div>
+
+"Simplicity is prequisite for reliability"
+
+<div class="reference">- Edsger W. Dijkstra</div>
+
+</div>
 </div>
 
 ---
