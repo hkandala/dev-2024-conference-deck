@@ -1,4 +1,4 @@
-# MDX Deck + Code Surfer template
+# DEV World 2024 Conference Deck
 
 This project was generated with the `npm init code-surfer-deck` command.
 Note that this project doesn't run on latest Node versions. Verified it on Node v16.20.2.
