@@ -1,0 +1,194 @@
+## Speaker Notes
+
+- Alright, let's get started!
+- Hey everyone, I am Harish Kandala.
+- In the next 20 minutes, we will go over different concurrency models and try to get a high level understanding of it.
+- We will first go over the question of why concurrency exists in the first place and why do we have so many concurrency models.
+- Then, we'll take a practical problem which can be solved concurrently and we will implement solution for it in different concurrency models.
+- Finally, we will also discuss the biggest question of all - which concurrency model to use?
+- Before diving deeper, a short introduction about me.
+- I work as an Enterprise Engineer at Meta in Amsterdam.
+- I see sometimes people getting confused what Enterprise Engineering really is.
+- Let me try to give a quick one liner intro.
+- Enterprise Engineering at Meta focuses on building internal tools. We aim to improve the speed and efficiency of metamates by building the right tools at the right time.
+- I hope that clarifies.
+- Let's jump into the topic.
+- I have come across this tweet some time ago.
+- I love this because it summarises the essence of concurrency in a single line.
+- And this also demonstrates why we ended up building so many different concurrency models in the first place, right.
+- Fundamentally, concurrency is a hard problem to solve and each model we have come up with is an attempt to solve this problem in a different way.
+- So, let's ask our first question, why concurrency exists in the first place.
+- This dates back to about 20 years ago
+- We all know about Moore's Law, right?
+- Moore's law states that the number of transistors on a chip doubles every two years
+- Even though we were able to increase the number of transistors, we hit the clock speed wall around early 2000s
+- Have you ever wondered why we don't have 10 GHz processors today?
+- We have achievd 3 GHz in mainstream processors in 2004-05 itself but the latest Apple M2 chip still caps around 3.49 GHz.
+- Well, long story short, what happened is, with the increase in number of transistors, the power consumption also doubled, which increased the heat generated and we hit a wall.
+- If you look at this graph, you can see that the clock speed and power has plateued around 2004-2005.
+- We had to find a way to make the most of the available resources and that's where all these concurrency models come into play.
+- As Herb Sutter famously puts it in his blog post, "The Free Lunch Is Over", we have got performance gains for free for a long time, but that's not the case anymore.
+- An important note here, I don't mean we didn't have concurrency before 2004, but the need for concurrency became more prominent after that.
+- That's a bit of short history class there
+- Now, let me give a quick primer on what concurrency is and how it is different from being parallel
+- If you look at the dictionary definition of concurrency, it says "simultaneous occurrence"
+- But when you use the word "concurrently" in a sentence, it usually means something like "at the same time"
+- But there is a subtle difference between "at the same time" and "simultaneous occurrence" which usually gets lost to when we refer something as concurrent.
+- So, let's put it formally, Concurrency is about composing and coordinating independently executing processes.
+- When I say "independently executing process" here, I mean it can be anything, be it thread, process, or task. All of them represent a sequence of instructions running in an order.
+- Let's say you have a problem to solve and concurrency provides a way to structure a solution that may be parallelizable but not necessarily.
+- All the definitions I am using here are from the Rob Pike's amazing talk titled "Concurrency Is Not Parallelism".
+- I strongly recommend you to watch that talk if you haven't already.
+- So, as Rob Pike puts it: Concurrency is about dealing with lots of things at once where as paralleism is about doing lot of things at once.
+- Concurrency is all about structure where as parallelism is all about execution.
+- Let's take a look at a practical example to understand the difference.
+- Most of the modern web servers are designed to handle multiple requests concurrently. Agree?
+- Let's say we have a web server implemented in Node.js which is single threaded.
+- At any point of time, Node.js process would be running only on a single CPU core because it is single threaded.
+- But it can handle multiple requests concurrently because of the way it is structured to handle non-blocking I/O.
+- Here, we are not executing multiple requests at the same time, but we are dealing with multiple requests at the same time.
+- And on the other hand, we can also run multiple Node.js processes on multiple CPU cores to handle multiple requests in parallel.
+- This is what when I mean concurrent programs can be parallelized but not necessarily.
+- Also all the four combinations are possible if that makes sense. What I mean is: an application can be concurrent and parallel, concurrent and not parallel, parallel and not concurrent, and neither concurrent nor parallel.
+- Again, I strongly recommend you to watch Rob Pike's talk to deep dive into this.
+- So, I hope I made it clear by now that concurrency is all about structure and coordination.
+- And we can structure and coordinate in different ways right.
+- Each concurrency model sets the ground rules and provides us tools on how we can structure our program and do any coordination if needed.
+- To simply put, a concurrency model is just a way of thinking about concurrency.
+- It should be easy to use, understand, and reason about.
+- And, all of these different models are all about how we handle this thing called shared mutable state.
+- Shared mutable is the root of all evil.
+- We can group these concurrency models broadly intro three categories based on how they handle this evil: shared mutable state.
+- Keep in mind that there are more but these are the most common ones.
+- Okay, let's start with the first one, shared memory synchronization.
+- I mean the terminology used might seem bit strange but I am sure you all are familiar with semaphore or locks, right?
+- Here, we are accepting the fact that we have shared mutable state and we are trying to use some tools or I would say a workaround to handle them.
+- Because we have shared mutable state, multiple threads can access this shared state at the same time and that's not actually good as we might end up in race conditions.
+- Anyone who worked on concurrent systems would tell you that race conditions are the worst to debug and fix.
+- So to avoid these race conditions we need to synchronize this shared memory access, ensuring that only one thread can access it at a time.
+- Well, we can achieve that using these synchronization primitives like locks, semaphores, or monitors controlling access to critical sections.
+- I won't go into the details of these as I assume most of you are familiar with them already.
+- And these synchronization primitives can be categorized into two types: blocking and non-blocking.
+- Note that this blocking and non-blocking not just applies to synchronization primitives but also to any concurrency algorithm, I bet you might have heard of these terms in the context of I/O operations as well like blocking I/O and non-blocking I/O.
+- In general, we can categorize any concurrency algorithm into blocking and non-blocking.
+- A blocking concurrency algorithm is basically either performs the action requested by the thread or blocks the thread until the action can be performed safely.
+- Where as a non-blocking concurrency algorithm either performs the action requested by the thread or notifies the requesting thread that the action could not be performed
+- So the difference is in how they handle the situation when the action can't be performed immediately.
+- In the context of synchronization primitives locks, mutexes, and semaphores are all examples of blocking concurrency algorithms.
+- Atomic operations like AtomicInteger or AtomicBoolean in Java or any other lock-free data structures are examples of non-blocking concurrency algorithms.
+- Most of you would be already feeling like: "this is too much theory, show me some code man".
+- I hear you guys, let's take a practical problem and solve it.
+- I spent a lot of time in figuring out which would be a good example to demonstrate, I hope this one is good.
+- So, the problem is simple - I want to know the most used word in all session abstracts of this conference.
+- All of you would have already visited devworldconference.com and if you go to program page, you can see all the session abstracts.
+- A simple reverse engineering led me to an API which has all the session abstracts.
+- But I am a responsible developer and I don't want to bombard their server with too many requests.
+- So, I copied the data and created a simple node.js server where given an id of a session, it returns the abstract.
+- Alright, so now we have an API where given an id of a session, it returns the abstract, and there are 135 sessions in total.
+- All we need to do is call this API 135 times, get the abstracts, tokenize them, and count the words. Simple right?
+- And note that I understand that this is a very simple problem, we can solve it in a single thread as well and concurrency is complete overkill, but for the sake of demonstration, let's solve it concurrently.
+- Let's first solve this problem in a single thread.
+- We are using Java here, but the language doesn't matter, solution should be more or less same in any language.
+- I am not showing implementation of getURLs(), but you can assume it just returns all the urls of the API.
+- Let's look into the first part where we are fetching the content of each URL sequentially and storing the responses in a list.
+- We are using Java's HttpClient to make the requests and fetch the responses.
+- Once we have list of responses, we loop through each response, use StringTokenizer to tokenize the content and populate the word count map.
+- StringTokenizer basically splits the strin based on any whitespace character.
+- We have a hashmap to store the word count frequency with word as key and frequency as value.
+- Once we have the word count map, we just need to sort them and print the most used words and that's what printMostUsedWords() does.
+- Seems straightforward, right? But we know that is not very efficient as we are waiting for each request to complete before making the next one.
+- Let's rebuild the solution in a multithreaded world.
+- We can architect the solution in multiple ways, but I am going with one of the most common patterns and that is producer-consumer pattern.
+- Producer consumer pattern is quite simple, we have a set of producer threads which produce some data and put it into a shared queue and we have a set of consumer threads which consume the data from the shared queue and do some processing on it.
+- Note that we are using a blocking queue here, which is a thread-safe queue and it blocks the producer thread if the queue is full and blocks the consumer thread if the queue is empty. We can also use a non-blocking queue here, but for the sake of simplicity, let's go with blocking queue.
+- In our case, the job of producer threads is to fetch the content of each URL which is the session abstract and push the response to the queue.
+- And the job of consumer threads is to consume the response from the queue, tokenize the content and populate the word count map.
+- Here, the word count map is the shared mutable state which we talked about earlier.
+- Let's see some code now.
+- We need to have two thread pools, one for producers and one for consumers.
+- We are using Java's ExecutorService to create thread pools.
+- Again, every language has its own way of creating thread pools, but the concept is same.
+- We are initializing the blocking queue here which is to communicate between producer and consumer threads.
+- We are also initializing the word count map which is our shared mutable state for all the consumer threads.
+- Now we loop over each url and submit a task to the producer thread pool which is the same piece of code we had in the single threaded solution.
+- Similarly, we create multiple consumers which listen to the queue and process the word count.
+- And that's it, we basically created multiple producer threads and consumer threads and accessing and updating the shared memory.
+- But there is a problem here, we are accessing the shared mutable state without any synchronization.
+- This critical section code can lead to race conditions.
+- As discussed earlier, we can use locks to synchronize the access to the shared mutable state.
+- Let's add a ReentrantLock and synchronize the critical section.
+- That's it, now our code is thread safe and free from race conditions.
+- We can also use synchronized block in Java which internally uses monitor locks. It's just another way of doing the same thing.
+- And that's it, we have solved the problem concurrently using shared memory synchronization.
+- I mean it seems quite simple, right?
+- We just need to throw a lock on the critical section and we are good to go.
+- But, it's not that simple all the time.
+- Let's take another example to see how it can become complex very quickly.
+- Here we are trying to implement transferMoney method which does money transfer between two accounts.
+- We have from account and a to account, we need to check if from account has enough balance and then debit from from account and credit to to account.
+- This is all good, but you might have already noticed it is not thread safe.
+- We are doing a check then do the money transfer which is a classic example of check-then-act and it is not thread safe.
+- So, like we did before let's throw a lock on the critical section and see what happens.
+- Note that we need to synchronize on both accounts as we are accessing both of them.
+- However, we can end up in a deadlock situation here.
+- Let's say we have two threads, one trying to transfer money from account A to account B and another trying to transfer money from account B to account A.
+- Both of them are trying to acquire locks in opposite order and we can end up in a deadlock.
+- And the solution to this is to ensure lock ordering, such that we always acquire locks in the same order.
+- We can do lock ordering based on some property of the account, like account number here.
+- Now we should be good.
+- Well, the reason I am showing this is to make a point that shared memory synchronization can become complex very quickly.
+- Even for a simple debit and credit operation, we need to be very careful about how we acquire locks to avoid deadlocks.
+- Now imagine I am building a complex payment service at Facebook scale like WhatsApp Pay, things can get very complex very quickly and not easily manageable.
+- And it's not just about deadlocks, there are many other problems like livelocks, thread contention, priority inversion and the list goes on.
+- And these are some of the common trade-offs we need to consider when using shared memory synchronization.
+- Now that we understand the trade-offs, let's see how other models handle shared mutable state.
+- Let's look into the second concurrency model, the actor model.
+- Here we avoid shared mutable state altogether.
+- We don't worry about threads, fundamental unit of computation is an actor.
+- Depending on the language, the actor framework will take care of the underlying threads and scheduling.
+- Actors are independent entities that communicate with each other by sending messages.
+- They have their own state and they can only communicate with each other by sending messages.
+- This falls under the category of message passing model.
+- Most of the modern programming languages have some sort of actor framework.
+- And in fact, languages like Erlang and Elixir have built-in support for the actor model. If you might have heard, WhatsApp is built on Erlang. It's a great example of how actor model can be used to build highly concurrent and fault-tolerant systems. WhatsApp has also published a post sometime in 2012 about how they scaled to 2 million connections per server using Erlang.
+- Let's architect the same problem using the actor model.
+- In our actor system, we have three types of actors: URLFetcher, WordCounter, and Orchestrator actor.
+- Their names pretty much explain what they do.
+- URLFetcher actor is responsible for fetching the content of each URL.
+- WordCounter actor is responsible for counting the words in the content.
+- Orchestrator actor is responsible for coordinating the whole process.
+- Our word count map is now the state of WordCounter actor.
+- We are not sharing the word count map between actors, but we are sending messages to the WordCounter actor to update its state.
+- This is the fundamental difference between shared memory synchronization and actor model.
+- On a high level, orchestrator actor creates new URLFetcher actor for each URL and sends a message to fetch the content.
+- Each inidividual URLFetcher actor fetches response by making a HTTP call concurrently and sends a message to WordCounter actor once it's done.
+- WordCounter actor counts the words and sends a message to Orchestrator indicating that it has processed one URL.
+- Once all the URLs are processed, Orchestrator actor sends a message to WordCounter actor to print the results.
+- And that's it, we just re-architected the same problem using the actor model.
+- Let's quickly look at the code for this.
+- I am using akka framework in Java for this, like I mentioned, most of the modern programming languages have some sort of actor framework that you can use.
+- This code is slightly exhaustive and I will try to skim through it covering the important parts.
+- So, let's start with the URLFetcher actor.
+- createReceive() is the method where we define the message handlers for any actor.
+- In this case URLFetcher actor has only one message handler which is onFetch.
+- Now if we look at onFetch, it is pretty much a simple http call to fetch the content of the URL.
+- Only important part here is, once we have the response, we send a message to WordCounter actor to count the words.
+- Now let's look at the WordCounter actor.
+- Remember from the architecture diagram, we have only one word counter actor which is responsible for counting the words in the content.
+- So, we are going to declare our word count map which will be the state of this actor.
+- And coming to message handlers, we have two message handlers here.
+- onCountWords is the message handler which is responsible for counting the words in the content.
+- Once we have the word count, we send a ProcessComplete message to Orchestrator actor indicating that we have processed one URL.
+- I am not showing the onPrintResults message handler here, but it's pretty straightforward, it just prints the most used words.
+- And the last actor is the Orchestrator actor.
+- Like we discussed, Orchestrator actor is responsible for coordinating the whole process and maintains all other actors.
+- We initialise the WordCounter actor and create one URLFetcher actors for each URL and send a message to them to fetch.
+- And looking at message handlers for this, we have one message handles for ProcessComplete message which is sent by WordCounter actor once it has processed one URL.
+- So, if we look at its implementation, it just increments the completed count and once all the URLs are processed, it sends a message to WordCounter actor to print the results.
+- Okay that' lot of code. Don't worry about implementation details as it's not very important and changes with language, the important part is the architecture and how we are using actors to solve the problem.
+- One good thing here in actor model is that we don't have shared mutable state, and we don't have to worry about things like deadlocks, livelocks, thread contention, etc. One short caveat here is that there are some very rare cases where we can end up in a deadlock in languages like Erlang, but it's not a common problem and you have to explicitly write code to end up in a deadlock.
+- But, it's not all sunshine and rainbows, there are trade-offs in everything and actor model is no exception.
+- First, there is overhead of creating and managing actors, and message passing.
+- There is complexity in state management, as we need to manage the state of each actor and the messages they send and receive.
+- There is a learning curve and difficulty in debygging as well.
+- And we have limited control over the underlying threads and scheduling, so if you want to get more control over the concurrency, actor model might not be the best choice.
