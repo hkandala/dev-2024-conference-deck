@@ -68,11 +68,52 @@ Harish Kandala
 
 </div>
 
+<Notes>
+  <div class="notes">
+    <p>Greetings and Intro</p>
+    <p>Relatively new to Amsterdam</p>
+    <p>30% ruling</p>
+    <p>
+      Enterprise Engineering at Meta focuses on building internal tools. The aim
+      is to improve the speed and efficiency of metamates by building the right
+      tools at the right time.
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div className="image-slide">
   <Image className="image" src={tweet} />
 </div>
+
+<Notes>
+  <div class="notes">
+    <p>
+      Interestingly enough, when I came across this tweet, I was breaking my
+      head around a concurreny related problem at work
+    </p>
+    <p>
+      Conccurency always used to baffle me and I had a hard time wrapping my
+      head around it.
+    </p>
+    <p>
+      It was a good reminder that concurrency is hard and it is not just me who
+      finds it hard
+    </p>
+    <p>
+      And since then, I got an opportunity to work on multiple concurrent
+      problems in different programming languages
+    </p>
+    <p>
+      And I thought it would be a good idea to share my learnings with you all
+    </p>
+    <p>
+      In the next 20 mins, we will go over different concurrency models and try
+      to get a holistic understanding of it.
+    </p>
+  </div>
+</Notes>
 
 ---
 
@@ -85,6 +126,16 @@ Harish Kandala
 - The primary goal of using concurrent programming is to make the most of the available resources.
 
 </div>
+
+<Notes>
+  <div class="notes">
+    <p>Dates back to 20 years ago.</p>
+    <p>Number of transistors on a chip doubles every two years</p>
+    <p>Why no 10GHz processor?</p>
+    <p>We achieved 3GHz in early 2000s itself</p>
+    <p>Clock speed wall because of power consumption and heat</p>
+  </div>
+</Notes>
 
 ---
 
@@ -101,6 +152,15 @@ Harish Kandala
 
 <div className="reference">- Herb Sutter</div>
 
+<Notes>
+  <div class="notes">
+    <p>
+      Important note that this does not mean we didn't have concurrency before
+      that
+    </p>
+  </div>
+</Notes>
+
 </div>
 </div>
 
@@ -116,6 +176,18 @@ Harish Kandala
 
 </div>
 
+<Notes>
+  <div class="notes">
+    <p>Simultaneous occurrence</p>
+    <p>At the same time</p>
+    <p>Composing and coordinating independently executing processes</p>
+    <p>
+      Concurerncy provides a way to structure a solution that may be
+      parallelizable but not necessarily
+    </p>
+  </div>
+</Notes>
+
 ---
 
 <div className="content-slide">
@@ -130,11 +202,24 @@ As Rob Pike puts it:
 
 </div>
 
+<Notes>
+  <div class="notes">
+    <p>Concurrency is not Parallelism talk credit</p>
+  </div>
+</Notes>
+
 ---
 
 <div className="image-slide" style={{ padding: "1.25em" }}>
   <Image className="image" src={comparisonDiagram} />
 </div>
+
+<Notes>
+  <div class="notes">
+    <p>Webserver on single core vs multiple core</p>
+    <p>Recommendation on Rob Pike's talk</p>
+  </div>
+</Notes>
 
 ---
 
@@ -151,6 +236,28 @@ As Rob Pike puts it:
   - asynchronous programming.
 
 </div>
+
+<Notes>
+  <div class="notes">
+    <p>
+      It's all about structure and coordination and we can do that in many ways
+    </p>
+    <p>
+      Concurrency model sets the ground rules and tools on how we can structure
+      and co-oridnate
+    </p>
+    <p>
+      And if you look at it each concurrency provides different solutions to
+      handle shared mutable state
+    </p>
+    <p>Shared mutable state is the root of all evil</p>
+    <p>
+      We can categorize these models into three categories based on how they
+      handle this evil
+    </p>
+    <p>Keep in mind there are more but these are the most common ones</p>
+  </div>
+</Notes>
 
 ---
 
@@ -1018,7 +1125,7 @@ func countWords(responseCh <-chan string, wordCountCh chan<- map[string]int) {
 
 ---
 
-<div className="center-slide">
+<div className="center-slide" style={{ backgroundColor: "white" }}>
   <video width="1600" height="900" autoPlay>
     <source src={channels} type="video/mp4" />
     Your browser does not support the video tag.
